@@ -1,11 +1,13 @@
-'use client'
+"use client";
 
-import Game from "./tictac"
+import Posts from "./components/posts";
 
 export default function Home() {
   return (
-   <div>
-    <Game />
-   </div>
+    <div className="">
+      <h1>Dashboard</h1>
+
+      <Posts />
+    </div>
   );
 }
