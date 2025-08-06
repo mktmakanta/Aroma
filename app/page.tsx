@@ -1,6 +1,6 @@
 "use client";
 
-import Posts from "./components/posts";
+import Posts from "../components/posts";
 
 export default function Home() {
   return (

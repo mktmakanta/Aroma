@@ -9,6 +9,7 @@ const generateSlug = (title: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)+/g, "");
 
+//GET ALL POSTS
 export async function GET() {
   try {
     const posts = await prisma.post.findMany({
@@ -23,11 +24,12 @@ export async function GET() {
   }
 }
 
+// ADD NEW POST
 export async function POST(req: Request) {
   try {
-    const { title, content, authorId } = await req.json();
+    const { title, content } = await req.json();
 
-    if (!title || !content || !authorId) {
+    if (!title || !content) {
       return new Response(JSON.stringify({ error: "Missing fields" }), {
         status: 400,
       });
@@ -41,7 +43,7 @@ export async function POST(req: Request) {
         content,
         slug,
         author: {
-          connect: { id: authorId },
+          connect: { id: "user-1-id" },
         },
       },
     });
