@@ -5,36 +5,31 @@ const prisma = new PrismaClient();
 
 export async function GET() {
   try {
-    const comments = await prisma.comment.findMany({
+    const users = await prisma.user.findMany({
       orderBy: {
         createdAt: "desc",
       },
       select: {
         id: true,
-        content: true,
+        email: true,
+        name: true,
         createdAt: true,
-        author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-        post: {
+        posts: {
           select: {
             id: true,
             title: true,
-            slug: true,
+            published: true,
+            createdAt: true,
           },
         },
       },
     });
 
-    return NextResponse.json(comments);
+    return NextResponse.json(users);
   } catch (error) {
-    console.error("Error fetching comments:", error);
+    console.error("Error fetching users:", error);
     return NextResponse.json(
-      { error: "Failed to fetch comments" },
+      { error: "Failed to fetch users" },
       { status: 500 }
     );
   }

@@ -1,4 +1,3 @@
-// app/api/posts/route.ts
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
@@ -9,7 +8,7 @@ const generateSlug = (title: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)+/g, "");
 
-//GET ALL POSTS
+// GET ALL POSTS
 export async function GET() {
   try {
     const posts = await prisma.post.findMany({
@@ -51,6 +50,38 @@ export async function POST(req: Request) {
     return new Response(JSON.stringify(post), { status: 201 });
   } catch (error: any) {
     console.error("POST /posts error:", error);
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+    });
+  }
+}
+
+// UPDATE POST (PUT)
+export async function PUT(req: Request) {
+  try {
+    const { slug, title, content } = await req.json();
+
+    if (!slug || (!title && !content)) {
+      return new Response(
+        JSON.stringify({ error: "Missing required fields" }),
+        {
+          status: 400,
+        }
+      );
+    }
+
+    const updatedPost = await prisma.post.update({
+      where: { slug }, //Using slug to find the post
+      data: {
+        ...(title && { title }),
+        ...(content && { content }),
+        ...(title && { slug: `${generateSlug(title)}-${Date.now()}` }),
+      },
+    });
+
+    return new Response(JSON.stringify(updatedPost), { status: 200 });
+  } catch (error: any) {
+    console.error("PUT /posts error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
     });
