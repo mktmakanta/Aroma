@@ -1,33 +1,19 @@
+// app/api/comments/route.ts
 import { NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/lib/prisma";
 
 export async function GET() {
   try {
     const comments = await prisma.comment.findMany({
-      orderBy: {
-        createdAt: "desc",
-      },
-      select: {
-        id: true,
-        content: true,
-        createdAt: true,
+      include: {
         author: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
+          select: { id: true, name: true, email: true },
         },
         post: {
-          select: {
-            id: true,
-            title: true,
-            slug: true,
-          },
+          select: { id: true, title: true, slug: true },
         },
       },
+      orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json(comments);

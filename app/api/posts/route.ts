@@ -13,7 +13,12 @@ export async function GET() {
   try {
     const posts = await prisma.post.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        categories: true, // Include category info in response
+        author: { select: { id: true, name: true, email: true } },
+      },
     });
+
     return new Response(JSON.stringify(posts), { status: 200 });
   } catch (error: any) {
     console.error("GET /posts error:", error);
@@ -23,10 +28,10 @@ export async function GET() {
   }
 }
 
-// ADD NEW POST
+// ADD NEW POST (with category IDs)
 export async function POST(req: Request) {
   try {
-    const { title, content } = await req.json();
+    const { title, content, categoryIds } = await req.json();
 
     if (!title || !content) {
       return new Response(JSON.stringify({ error: "Missing fields" }), {
@@ -42,46 +47,21 @@ export async function POST(req: Request) {
         content,
         slug,
         author: {
-          connect: { id: "user-1-id" },
+          connect: { id: "user-1-id" }, // Replace with actual logged-in user ID
         },
+        categories: {
+          connect: categoryIds?.map((id: string) => ({ id })) || [],
+        },
+      },
+      include: {
+        categories: true,
+        author: { select: { id: true, name: true, email: true } },
       },
     });
 
     return new Response(JSON.stringify(post), { status: 201 });
   } catch (error: any) {
     console.error("POST /posts error:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-    });
-  }
-}
-
-// UPDATE POST (PUT)
-export async function PUT(req: Request) {
-  try {
-    const { slug, title, content } = await req.json();
-
-    if (!slug || (!title && !content)) {
-      return new Response(
-        JSON.stringify({ error: "Missing required fields" }),
-        {
-          status: 400,
-        }
-      );
-    }
-
-    const updatedPost = await prisma.post.update({
-      where: { slug }, //Using slug to find the post
-      data: {
-        ...(title && { title }),
-        ...(content && { content }),
-        ...(title && { slug: `${generateSlug(title)}-${Date.now()}` }),
-      },
-    });
-
-    return new Response(JSON.stringify(updatedPost), { status: 200 });
-  } catch (error: any) {
-    console.error("PUT /posts error:", error);
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
     });
