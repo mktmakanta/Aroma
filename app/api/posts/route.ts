@@ -28,10 +28,10 @@ export async function GET() {
   }
 }
 
-// ADD NEW POST (with category IDs)
+// ADD NEW POST (with category & tag IDs)
 export async function POST(req: Request) {
   try {
-    const { title, content, categoryIds } = await req.json();
+    const { title, content, categoryIds, tagIds } = await req.json();
 
     if (!title || !content) {
       return new Response(JSON.stringify({ error: "Missing fields" }), {
@@ -52,9 +52,13 @@ export async function POST(req: Request) {
         categories: {
           connect: categoryIds?.map((id: string) => ({ id })) || [],
         },
+        tags: {
+          connect: tagIds?.map((id: string) => ({ id })) || [],
+        },
       },
       include: {
         categories: true,
+        tags: true,
         author: { select: { id: true, name: true, email: true } },
       },
     });
