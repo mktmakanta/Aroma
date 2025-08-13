@@ -1,13 +1,11 @@
 "use client";
 
-import Posts from "../components/posts";
-
 export default function Home() {
   return (
-    <div className="">
-      <h1>Dashboard</h1>
-
-      <Posts />
+    <div>
+      <div className="m-14">
+        <h1>Dashboard</h1>
+      </div>
     </div>
   );
 }
