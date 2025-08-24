@@ -1,54 +1,21 @@
 const User = require('../models/User');
+const APIFeatures = require('./../utils/apiFeatures');
 
 exports.topUsers = (req, res, next) => {
   req.query.limit = '4';
   req.query.sort = 'name,role'; // ✅
-  req.query.fields = 'name,email,bio'; //good
+  req.query.fields = 'name,email,bio';
   next();
 };
 
 exports.getUsers = async (req, res) => {
   try {
-    console.log(req.query);
-
-    // BUILD QUERY
-    const queryObj = { ...req.query };
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    excludedFields.forEach((el) => delete queryObj[el]);
-
-    // ADVANCED
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-    let query = User.find(JSON.parse(queryStr));
-
-    // SORTING
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      query = query.sort(sortBy);
-    } else {
-      query = query.sort('-createdAt');
-    }
-
-    // FIELD LIMITING
-    if (req.query.fields) {
-      const fields = req.query.fields.split(',').join(' ');
-      query = query.select(fields);
-    } else {
-      query = query.select('-__v');
-    }
-
-    // PAGINATION
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 100;
-    const skip = (page - 1) * limit;
-    query = query.skip(skip).limit(limit);
-
-    if (req.query.page) {
-      const numUsers = await User.countDocuments();
-      if (skip >= numUsers) throw new Error('This users does not exist');
-    }
-
-    const users = await query;
+    const userFeatures = new APIFeatures(User.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const users = await userFeatures.query;
     res.status(200).json({
       status: 200,
       results: users.length,

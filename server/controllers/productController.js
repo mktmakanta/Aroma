@@ -1,4 +1,5 @@
 const Product = require('../models/Product');
+const APIFeatures = require('./../utils/apiFeatures');
 
 // GET TOP 5 PRODUCT USING ALIASING
 exports.topProducts = (req, res, next) => {
@@ -12,46 +13,12 @@ exports.topProducts = (req, res, next) => {
 // GET ALL products
 exports.getProducts = async (req, res) => {
   try {
-    console.log(req.query);
-
-    // 1) FILTERING
-    // -----BUILD QUERY-----
-    const queryObj = { ...req.query };
-    const excludedFields = ['page', 'sort', 'limit', 'fields'];
-    excludedFields.forEach((el) => delete queryObj[el]);
-
-    // --------ADVANCED---------
-    let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
-
-    let query = Product.find(JSON.parse(queryStr));
-
-    // 2) SORTING
-    if (req.query.sort) {
-      const sortBy = req.query.sort.split(',').join(' ');
-      query = query.sort(sortBy);
-    } else {
-      query = query.sort('-createdAt');
-    }
-
-    // 3) FIELD LIMITING
-    if (req.query.fields) {
-      const fields = req.query.fields.split(',').join(' ');
-      query = query.select(fields);
-    } else {
-      query = query.select('-__v');
-    }
-
-    // 4) PAGINATION
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 || 100;
-    const skip = (page - 1) * limit;
-    query = query.skip(skip).limit(limit);
-    if (req.query.page) {
-      const numproducts = await Product.countDocuments();
-      if (skip >= numproducts) throw new Error('This page does not exist');
-    }
-    const products = await query.populate('user', 'name email');
+    const features = new APIFeatures(Product.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const products = await features.query.populate('user', 'name email');
     // .populate('reviews', 'comment rating')
     // .populate('categories', 'name')
     // .populate('tags', 'name');
