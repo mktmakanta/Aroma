@@ -7,24 +7,18 @@ const orderSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    totalPrice: {
-      type: Number,
-      required: true,
-      default: 0,
-    },
-    author: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-      },
-    ],
-    orderItem: [
+    orderItems: [
       {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'OrderItem',
       },
     ],
+    totalPrice: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+
     status: {
       type: String,
       enum: ['pending', 'paid', 'shipped', 'delivered'],

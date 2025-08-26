@@ -1,0 +1,59 @@
+
+
+ORDER ITEM OPERATION
+
+1.  Create OrderItem
+
+2.  Get all OrderItems (admin/debugging mostly).
+
+3.  Get OrderItem by ID:  Useful for fetching details of a specific cart item.
+
+4.  Update OrderItem
+
+5.  Change quantity, maybe re-calculate price.
+
+6.  Delete OrderItem: When user removes it from cart or cancels before checkout.
+
+
+ORDER OPERATION
+
+1.  Create Order :From cart/orderItems, linked to user.
+
+2.  Get All Orders: For admin: see all orders in the system. Add filters like status=pending or user=<id>.
+
+3.  Get Order by ID: Shows order details with populated orderItems & product info.
+
+4.  Get Orders by User: User sees only their past orders (e.g., “My Orders” page).
+
+5.  Update Order Status:  Admin marks order as pending → Shipped → Delivered. User might only be allowed to Cancel before shipping.
+
+6.  Delete Order: Admin deletes an order (should also delete orderItems). Sometimes only soft-delete instead of hard delete.
+
+
+EXTRA USEFUL OPERATIONS
+
+1.  Cancel Order: Special case of updateOrderStatus, but usually restricted by rules (e.g., only before shipping).
+
+2.  Payment Integration:  An endpoint like /orders/:id/pay to mark order as paid. Store payment details (transaction ID, method).
+
+3.  Shipping Info:  Add/update address, delivery method, tracking number.
+
+4.  Analytics (Admin):  Total sales, number of orders, revenue reports. Usually via aggregation pipelines.
+
+
+REVIEWS
+
+1.  Add a review for a product
+
+2.  Get all reviews for a product
+
+3.  Update review
+
+4.  Delete review
+
+TAGS
+1.  Create a tag (though with your enum, you might pre-seed instead of letting users create freely)
+
+2.  Get all tags
+
+3.  Get products by tag

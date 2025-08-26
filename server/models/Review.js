@@ -2,14 +2,13 @@ const mongoose = require('mongoose');
 
 const reviewSchema = new mongoose.Schema(
   {
-    product: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Product',
-        require: true,
-      },
-    ],
-    author: {
+    product: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      require: true,
+    },
+
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
@@ -29,7 +28,6 @@ const reviewSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const Order =
-  mongoose.models.ReviewItem || mongoose.model('Review', reviewSchema);
+const Review = mongoose.models.Review || mongoose.model('Review', reviewSchema);
 
-module.exports = Order;
+module.exports = Review;

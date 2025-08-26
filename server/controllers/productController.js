@@ -18,9 +18,10 @@ exports.getProducts = async (req, res) => {
       .sort()
       .limitFields()
       .paginate();
-    const products = await features.query.populate('user', 'name email');
-    // .populate('reviews', 'comment rating')
-    // .populate('categories', 'name')
+    const products = await features.query
+      .populate('user', 'name email')
+      .populate('reviews', 'comment rating')
+      .populate('categories', 'name');
     // .populate('tags', 'name');
     res.status(200).json({
       status: 200,
@@ -41,12 +42,10 @@ exports.getProducts = async (req, res) => {
 // GET A PRODUCT BY ID
 exports.getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).populate(
-      'user',
-      'name email'
-    );
-    // .populate('reviews', 'comment rating')
-    // .populate('categories', 'name')
+    const product = await Product.findById(req.params.id)
+      .populate('user', 'name email')
+      .populate('reviews', 'comment rating')
+      .populate('categories', 'name');
     // .populate('tags', 'name');
     if (!product) {
       return res
@@ -96,9 +95,10 @@ exports.updateProduct = async (req, res) => {
         new: true,
         runValidators: true,
       }
-    ).populate('user', 'name email');
-    // .populate('reviews', 'comment rating')
-    // .populate('categories', 'name')
+    )
+      .populate('user', 'name email')
+      .populate('reviews', 'comment rating')
+      .populate('categories', 'name');
     // .populate('tags', 'name');
     if (!updatedProduct) {
       return res
