@@ -1,13 +1,11 @@
 const Review = require('../models/Review');
 const Product = require('../models/Product');
+// const User = require('../models/User'); // Uncomment if user details are needed
 
-// @desc    Create Review
-// @route   POST /api/reviews
 exports.createReview = async (req, res) => {
   try {
     const { productId, comment, rating } = req.body;
-    // fake user until auth is ready
-    req.user = req.user || { _id: '68aa54d2c89316ae4619fdc6' };
+    req.user = req.user || { _id: '68aa5594c89316ae4619fdcc' };
 
     const product = await Product.findById(productId);
     if (!product) return res.status(404).json({ message: 'Product not found' });
@@ -20,6 +18,10 @@ exports.createReview = async (req, res) => {
     });
 
     const createdReview = await review.save();
+    await Product.findByIdAndUpdate(productId, {
+      $push: { reviews: review._id },
+    });
+
     res.status(201).json({
       message: 'Review created',
       review: createdReview,
@@ -29,8 +31,6 @@ exports.createReview = async (req, res) => {
   }
 };
 
-// @desc    Get Reviews by Product
-// @route   GET /api/reviews/product/:id
 exports.getReviewsByProduct = async (req, res) => {
   try {
     const reviews = await Review.find({ product: req.params.id })
@@ -43,11 +43,9 @@ exports.getReviewsByProduct = async (req, res) => {
   }
 };
 
-// @desc    Update Review
-// @route   PUT /api/reviews/:id
 exports.updateReview = async (req, res) => {
   try {
-    req.user = req.user || { _id: '68aa54d2c89316ae4619fdc6' };
+    req.user = req.user || { _id: '68aa5594c89316ae4619fdcc' };
 
     const review = await Review.findById(req.params.id);
     if (!review) return res.status(404).json({ message: 'Review not found' });
@@ -66,11 +64,9 @@ exports.updateReview = async (req, res) => {
   }
 };
 
-// @desc    Delete Review
-// @route   DELETE /api/reviews/:id
 exports.deleteReview = async (req, res) => {
   try {
-    req.user = req.user || { _id: '68aa54d2c89316ae4619fdc6' };
+    req.user = req.user || { _id: '68aa5594c89316ae4619fdcc' };
 
     const review = await Review.findById(req.params.id);
     if (!review) return res.status(404).json({ message: 'Review not found' });

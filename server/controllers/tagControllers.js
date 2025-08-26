@@ -1,40 +1,92 @@
 const Tag = require('../models/Tag');
-const Product = require('../models/Product');
 
-exports.getTags = async (req, res) => {
-  try {
-    const tags = await Tag.find().sort({ name: 1 });
-    res.json(tags);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
-
-// OPTIONAL: If you want to allow tag creation
+// CREATE TAG
 exports.createTag = async (req, res) => {
   try {
-    const { name } = req.body;
+    const existingTag = await Tag.findOne({ name: req.body.name });
+    if (existingTag) {
+      return res.status(400).json({
+        status: 'fail',
+        message: 'Tag already exists',
+      });
+    }
 
-    const exists = await Tag.findOne({ name });
-    if (exists) return res.status(400).json({ message: 'Tag already exists' });
-
-    const tag = new Tag({ name });
-    const createdTag = await tag.save();
-
-    res.status(201).json(createdTag);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+    const tag = await Tag.create(req.body);
+    res.status(201).json({
+      status: 'success',
+      message: 'Tag created successfully',
+      data: { tag },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Failed to create tag',
+      err,
+    });
   }
 };
 
-exports.getProductsByTag = async (req, res) => {
+// GET ALL TAGS
+exports.getTags = async (req, res) => {
   try {
-    const products = await Product.find({ tags: req.params.tag })
-      .populate('category', 'name')
-      .select('name price description tags');
+    const tags = await Tag.find();
+    res.status(200).json({
+      status: 'success',
+      results: tags.length,
+      data: { tags },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Failed to fetch tags',
+      err,
+    });
+  }
+};
 
-    res.json(products);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+// GET TAG BY ID
+exports.getTagById = async (req, res) => {
+  try {
+    const tag = await Tag.findById(req.params.id);
+    if (!tag) {
+      return res.status(404).json({
+        status: 'fail',
+        message: 'Tag not found',
+      });
+    }
+    res.status(200).json({
+      status: 'success',
+      data: { tag },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Failed to fetch tag',
+      err,
+    });
+  }
+};
+
+// DELETE TAG
+exports.deleteTag = async (req, res) => {
+  try {
+    const tag = await Tag.findByIdAndDelete(req.params.id);
+    if (!tag) {
+      return res.status(404).json({
+        status: 'fail',
+        message: 'Tag not found',
+      });
+    }
+    res.status(204).json({
+      status: 'success',
+      message: 'Tag deleted successfully',
+      data: null,
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Failed to delete tag',
+      err,
+    });
   }
 };

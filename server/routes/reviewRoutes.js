@@ -4,13 +4,13 @@ const {
   getReviewsByProduct,
   updateReview,
   deleteReview,
-} = require('./../controllers/reviewControllers');
-// const { protect } = require('../middleware/authMiddleware'); // auth middleware
+} = require('../controllers/reviewControllers');
+// const { protect } = require('../middleware/authMiddleware'); // uncomment later for auth
 
 const router = express.Router();
-
-router.route('/').post(createReview); // add prtected route when auth is ready
-router.route('/:id').delete(deleteReview).patch(updateReview); //protect, //protect,
-router.route('/product/:id').get(getReviewsByProduct);
+router.post('/', createReview); // later: [protect, createReview]
+router.get('/product/:id', getReviewsByProduct);
+router.patch('/:id', updateReview); // later: [protect, updateReview]
+router.delete('/:id', deleteReview); // later: [protect, deleteReview]
 
 module.exports = router;

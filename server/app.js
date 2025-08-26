@@ -7,6 +7,7 @@ const categoryRoutes = require('./routes/categoryRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const orderItemsRoutes = require('./routes/orderItems');
 const reviewRoutes = require('./routes/reviewRoutes');
+const tagRoutes = require('./routes/tagRoutes');
 
 const app = express();
 
@@ -20,18 +21,10 @@ app.use(express.json());
 // ROUTES
 app.use('/api/v1/products', productsRoutes);
 app.use('/api/v1/users', usersRoutes);
-app.use('/api/v1/category', categoryRoutes);
+app.use('/api/v1/categories', categoryRoutes);
 app.use('/api/v1/orders', orderRoutes);
-app.use('/api/v1/order-item', orderItemsRoutes);
-app.use('/api/v1/review', reviewRoutes);
-
-// ERROR HANDLER
-app.all('*', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `Page with the ${req.originalUrl} not found`,
-  });
-  next();
-});
+app.use('/api/v1/order-items', orderItemsRoutes);
+app.use('/api/v1/reviews', reviewRoutes);
+app.use('/api/v1/tags', tagRoutes);
 
 module.exports = app;

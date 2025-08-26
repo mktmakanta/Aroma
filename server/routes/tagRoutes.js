@@ -1,15 +1,14 @@
 const express = require('express');
-const {
-  getTags,
-  createTag,
-  getProductsByTag,
-} = require('../controllers/tagController');
-// const { protect, admin } = require('../middleware/authMiddleware');
+const tagController = require('../controllers/tagControllers');
 
 const router = express.Router();
 
-router.route('/').get(getTags).post(createTag); //  protect, admin,
+router.route('/').post(tagController.createTag).get(tagController.getTags);
 
-// router.route('/:tag/products').get(getProductsByTag);
+router
+  .route('/:id')
+  .get(tagController.getTagById)
+  // .patch(tagController.updateTag) // update route is not needed because of enum in
+  .delete(tagController.deleteTag);
 
 module.exports = router;

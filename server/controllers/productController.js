@@ -21,8 +21,8 @@ exports.getProducts = async (req, res) => {
     const products = await features.query
       .populate('user', 'name email')
       .populate('reviews', 'comment rating')
-      .populate('categories', 'name');
-    // .populate('tags', 'name');
+      .populate('categories', 'name')
+      .populate('tags', 'name');
     res.status(200).json({
       status: 200,
       results: products.length,
@@ -44,9 +44,9 @@ exports.getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id)
       .populate('user', 'name email')
+      .populate('categories', 'name')
       .populate('reviews', 'comment rating')
-      .populate('categories', 'name');
-    // .populate('tags', 'name');
+      .populate('tags', 'name');
     if (!product) {
       return res
         .status(404)
@@ -98,8 +98,8 @@ exports.updateProduct = async (req, res) => {
     )
       .populate('user', 'name email')
       .populate('reviews', 'comment rating')
-      .populate('categories', 'name');
-    // .populate('tags', 'name');
+      .populate('categories', 'name')
+      .populate('tags', 'name');
     if (!updatedProduct) {
       return res
         .status(404)
@@ -140,3 +140,12 @@ exports.deleteProduct = async (req, res) => {
     });
   }
 };
+
+// exports.deleteAllProducts = async (req, res) => {
+//   try {
+//     await Product.deleteMany({});
+//     res.status(200).json({ message: 'All products deleted successfully' });
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
