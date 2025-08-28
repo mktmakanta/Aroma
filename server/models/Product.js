@@ -87,7 +87,7 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// ----------MONGOOSE DOCUMENT MIDDLEWARE------------
+// Auto-generate unique slug from title
 productSchema.pre('save', async function (next) {
   if (this.isModified('name')) {
     let baseSlug = slugify(this.name, { lower: true, strict: true });
