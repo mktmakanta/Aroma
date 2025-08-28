@@ -87,7 +87,7 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Auto-generate unique slug from title
+// ----------MONGOOSE DOCUMENT MIDDLEWARE------------ (We can have pre-save, OR post-save,  Next should always be called)
 productSchema.pre('save', async function (next) {
   if (this.isModified('name')) {
     let baseSlug = slugify(this.name, { lower: true, strict: true });
