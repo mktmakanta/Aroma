@@ -91,7 +91,7 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Auto-generate unique slug from title
+// ----------MONGOOSE DOCUMENT MIDDLEWARE------------ (We can have pre-save, OR post-save,  Next should always be called)
 productSchema.pre('save', async function (next) {
   if (this.isModified('name')) {
     let baseSlug = slugify(this.name, { lower: true, strict: true });
@@ -107,6 +107,21 @@ productSchema.pre('save', async function (next) {
   }
   next();
 });
+
+// productSchema.post('save', function (doc, next) {
+//   console.log(doc);
+//   next();
+// });
+
+// ---------MONGOOSE QUERY MIDDLEWARE----------
+// productSchema.pre('find', function (next) {
+//   this.find({ published: true });
+//   next();
+// });
+
+// ------------AGGREGATION MIDDLEWARE--------------
+// productSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { published: true } });
 
 const Product =
   mongoose.models.Product || mongoose.model('Product', productSchema);
