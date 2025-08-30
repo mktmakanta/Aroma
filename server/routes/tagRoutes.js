@@ -10,6 +10,6 @@ const router = express.Router();
 
 router.route('/').get(getTags).post(createTag); //  protect, admin,
 
-router.route('/:tag/products').get(getProductsByTag);
+// router.route('/:tag/products').get(getProductsByTag);
 
 module.exports = router;

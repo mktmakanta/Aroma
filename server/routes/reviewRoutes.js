@@ -10,7 +10,7 @@ const {
 const router = express.Router();
 
 router.route('/').post(createReview); // add prtected route when auth is ready
+router.route('/:id').delete(deleteReview).patch(updateReview); //protect, //protect,
 router.route('/product/:id').get(getReviewsByProduct);
-router.route('/:id').delete(deleteReview).put(updateReview); //protect, //protect,
 
 module.exports = router;
