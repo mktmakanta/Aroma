@@ -3,10 +3,6 @@ const slugify = require('slugify');
 
 const productSchema = new mongoose.Schema(
   {
-    // name, slug, description, brand (can be enum), image, price, countInStock, published
-    //---references---author, orderItems, tags, category, rating, reviews
-    // updatedAt, createdAt
-
     name: {
       type: String,
       required: [true, 'Title is required'],
@@ -22,7 +18,7 @@ const productSchema = new mongoose.Schema(
     description: {
       type: String,
       required: [true, 'Description is required'],
-      maxlength: 1000,
+      maxlength: 2000,
     },
     brand: {
       type: String,
@@ -91,7 +87,7 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// ----------MONGOOSE DOCUMENT MIDDLEWARE------------ (We can have pre-save, OR post-save,  Next should always be called)
+// ----------MONGOOSE DOCUMENT MIDDLEWARE------------
 productSchema.pre('save', async function (next) {
   if (this.isModified('name')) {
     let baseSlug = slugify(this.name, { lower: true, strict: true });

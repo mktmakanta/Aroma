@@ -1,7 +1,6 @@
 const Tag = require('../models/Tag');
 const Product = require('../models/Product');
 
-// @desc Get all tags
 exports.getTags = async (req, res) => {
   try {
     const tags = await Tag.find().sort({ name: 1 });
@@ -11,7 +10,7 @@ exports.getTags = async (req, res) => {
   }
 };
 
-// @desc Create a new tag (optional if you want to allow dynamic tags)
+// OPTIONAL: If you want to allow tag creation
 exports.createTag = async (req, res) => {
   try {
     const { name } = req.body;
@@ -28,7 +27,6 @@ exports.createTag = async (req, res) => {
   }
 };
 
-// @desc Get products by tag
 exports.getProductsByTag = async (req, res) => {
   try {
     const products = await Product.find({ tags: req.params.tag })

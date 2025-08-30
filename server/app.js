@@ -25,4 +25,13 @@ app.use('/api/v1/orders', orderRoutes);
 app.use('/api/v1/order-item', orderItemsRoutes);
 app.use('/api/v1/review', reviewRoutes);
 
+// ERROR HANDLER
+app.all('*', (req, res, next) => {
+  res.status(404).json({
+    status: 'fail',
+    message: `Page with the ${req.originalUrl} not found`,
+  });
+  next();
+});
+
 module.exports = app;
