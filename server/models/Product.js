@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
+// const validator = require('validator');
 
 const productSchema = new mongoose.Schema(
   {
@@ -8,6 +9,7 @@ const productSchema = new mongoose.Schema(
       required: [true, 'Title is required'],
       trim: true,
       maxlength: 50,
+      // validate: [validator.isAlpha, 'Product name must only contain characters'],
     },
     slug: {
       type: String,
@@ -35,6 +37,17 @@ const productSchema = new mongoose.Schema(
       type: Number,
       require: [true, 'Price of product is required'],
       min: 0,
+    },
+    pricDiscount: {
+      type: Number,
+      min: 0,
+      validate: {
+        validator: function (val) {
+          // this only points to current doc on NEW document creation
+          return val < this.price;
+        },
+        message: 'Discount price ({VALUE}) should be below regular price',
+      },
     },
     countInStock: {
       type: Number,
@@ -65,7 +78,7 @@ const productSchema = new mongoose.Schema(
       },
     ],
     categories: [
-      { 
+      {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
       },
