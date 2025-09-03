@@ -149,3 +149,92 @@ exports.deleteProduct = async (req, res) => {
 //     res.status(500).json({ message: error.message });
 //   }
 // };
+
+exports.productStats = async (req, res) => {
+  try {
+    const stats = await Product.aggregate([
+      {
+        // $match: { price: { $gte: 0 } },
+        $match: { price: { $gte: 0 } },
+      },
+
+      {
+        $group: {
+          _id: { $toUpper: '$brand' }, // set to null to get overall stats
+          numProducts: { $sum: 1 },
+          avgPrice: { $avg: '$price' },
+          minPrice: { $min: '$price' },
+          maxPrice: { $max: '$price' },
+          countInStock: { $sum: '$countInStock' },
+          // totalCountInStock: { $sum: '$countInStock' },
+        },
+      },
+      {
+        $sort: { avgPrice: 1 },
+      },
+    ]);
+    res.status(200).json({
+      status: 'success',
+      data: {
+        stats,
+      },
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Failed to get product stats',
+      err,
+    });
+  }
+};
+
+exports.categoryStats = async (req, res) => {
+  try {
+    const stats = await Product.aggregate([
+      {
+        $facet: {
+          // Per category stats
+          perCategory: [
+            { $unwind: '$categories' },
+            {
+              $group: {
+                _id: '$categories',
+                numProducts: { $sum: 1 },
+                avgPrice: { $avg: '$price' },
+                minPrice: { $min: '$price' },
+                maxPrice: { $max: '$price' },
+                countInStock: { $sum: '$countInStock' },
+              },
+            },
+            { $sort: { numProducts: -1 } },
+          ],
+
+          // Overall stats
+          overall: [
+            {
+              $group: {
+                _id: null,
+                totalStock: { $sum: '$countInStock' },
+                avgPriceAll: { $avg: '$price' },
+                totalAmount: {
+                  $sum: { $multiply: ['$price', '$countInStock'] },
+                },
+              },
+            },
+          ],
+        },
+      },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      data: stats[0], // facet returns an array with { perCategory, overall }
+    });
+  } catch (err) {
+    res.status(400).json({
+      status: 'fail',
+      message: 'Failed to get category stats',
+      err,
+    });
+  }
+};

@@ -55,6 +55,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// ENCRYPT PASSWORD USING BCRYPT
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 

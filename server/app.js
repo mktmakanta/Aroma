@@ -27,4 +27,20 @@ app.use('/api/v1/order-items', orderItemsRoutes);
 app.use('/api/v1/reviews', reviewRoutes);
 app.use('/api/v1/tags', tagRoutes);
 
+app.all('*', (req, res, next) => {
+  const err = new Error(`Can't find ${req.originalUrl} on this server!`);
+  err.status = 'fail';
+  err.statusCode = 404;
+  next(err);
+});
+
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const status = err.status || 'error';
+  res.status(statusCode).json({
+    status: status,
+    message: err.message,
+  });
+});
+
 module.exports = app;
