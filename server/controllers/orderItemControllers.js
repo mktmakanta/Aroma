@@ -1,91 +1,70 @@
 const OrderItem = require('../models/OrderItem');
 const Product = require('../models/Product');
+const AppError = require('../utils/appError');
+const catchAsync = require('../utils/catchAsync');
 
-exports.createOrderItem = async (req, res) => {
-  try {
-    const query = req.body;
+exports.createOrderItem = catchAsync(async (req, res, next) => {
+  const query = req.body;
 
-    const productDoc = await Product.findById(query.product);
-    if (!productDoc)
-      return res.status(404).json({ message: 'Product not found' });
+  const productDoc = await Product.findById(query.product);
+  if (!productDoc) return next(new AppError('Product not found!', 404));
 
-    const orderItem = new OrderItem({
-      product: query.product,
-      quantity: query.quantity,
-      price: productDoc.price * query.quantity,
-    });
-    const createdOrderItem = await OrderItem.create(orderItem);
-    res.status(201).json(createdOrderItem);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+  const orderItem = await OrderItem.create({
+    product: query.product,
+    quantity: query.quantity,
+    price: productDoc.price * query.quantity,
+  });
 
-exports.getOrderItems = async (req, res) => {
-  try {
-    const orderItems = await OrderItem.find().populate('product', 'name price');
-    res.json({
-      status: 'success',
-      message: 'product created successfully',
-      count: orderItems.length,
-      data: {
-        product: orderItems,
-      },
-    });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+  res.status(201).json(orderItem);
+});
 
-exports.getOrderItemById = async (req, res) => {
-  try {
-    const orderItem = await OrderItem.findById(req.params.id).populate(
-      'product',
-      'name price'
-    );
+exports.getOrderItems = catchAsync(async (req, res, next) => {
+  const orderItems = await OrderItem.find().populate('product', 'name price');
+  res.json({
+    status: 'success',
+    message: 'Order items fetched successfully',
+    count: orderItems.length,
+    data: {
+      product: orderItems,
+    },
+  });
+});
 
-    if (!orderItem)
-      return res.status(404).json({ message: 'Order item not found' });
+exports.getOrderItemById = catchAsync(async (req, res, next) => {
+  const orderItem = await OrderItem.findById(req.params.id).populate(
+    'product',
+    'name price'
+  );
 
-    res.json(orderItem);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+  if (!orderItem) return next(new AppError('Order item not found', 404));
 
-exports.updateOrderItem = async (req, res) => {
-  try {
-    const { quantity } = req.body;
-    const orderItem = await OrderItem.findById(req.params.id);
+  res.json(orderItem);
+});
 
-    if (!orderItem)
-      return res.status(404).json({ message: 'Order item not found' });
+exports.updateOrderItem = catchAsync(async (req, res, next) => {
+  const { quantity } = req.body;
+  const orderItem = await OrderItem.findById(req.params.id);
 
-    if (quantity !== undefined) {
-      orderItem.quantity = quantity;
-      const productDoc = await Product.findById(orderItem.product);
-      if (productDoc) {
-        orderItem.price = productDoc.price * quantity;
-      }
+  if (!orderItem) return next(new AppError('Order item not found', 404));
+
+  if (quantity !== undefined) {
+    orderItem.quantity = quantity;
+    const productDoc = await Product.findById(orderItem.product);
+    if (productDoc) {
+      orderItem.price = productDoc.price * quantity;
     }
-
-    const updatedOrderItem = await orderItem.save();
-    res.json(updatedOrderItem);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
-};
 
-exports.deleteOrderItem = async (req, res) => {
-  try {
-    const orderItem = await OrderItem.findById(req.params.id);
+  const updatedOrderItem = await orderItem.save();
+  res.json(updatedOrderItem);
+});
 
-    if (!orderItem)
-      return res.status(404).json({ message: 'Order item not found' });
+exports.deleteOrderItem = catchAsync(async (req, res, next) => {
+  const orderItem = await OrderItem.findById(req.params.id);
 
-    await orderItem.deleteOne();
-    res.json({ message: 'Order item removed' });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+  if (!orderItem)
+    return next(new AppError('Order item not found', 404));
+
+  await orderItem.deleteOne();
+  res.json({ message: 'Order item removed' });
+});

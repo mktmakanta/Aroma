@@ -14,10 +14,9 @@ router
 
 router
   .route('/')
-  .get(authController.protect, userController.getUsers) //protected route
+  .get(authController.protect, userController.getUsers)
   .post(userController.createUser);
 
-// router.param('id', userController.validateUserId);
 router
   .route('/:id')
   .get(userController.getUserById)
