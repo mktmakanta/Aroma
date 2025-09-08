@@ -101,10 +101,10 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
   });
 });
 
-// exports.deleteAllProducts = catchAsync(async (req, res, next) => {
-//   await Product.deleteMany({});
-//   res.status(200).json({ message: 'All products deleted successfully' });
-// });
+exports.deleteAllProducts = catchAsync(async (req, res, next) => {
+  await Product.deleteMany({});
+  res.status(200).json({ message: 'All products deleted successfully' });
+});
 
 exports.productStats = catchAsync(async (req, res, next) => {
   const stats = await Product.aggregate([

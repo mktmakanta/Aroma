@@ -9,6 +9,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const orderItemsRoutes = require('./routes/orderItems');
 const reviewRoutes = require('./routes/reviewRoutes');
 const tagRoutes = require('./routes/tagRoutes');
+const errorController = require('./controllers/errorController');
 
 const app = express();
 
@@ -35,14 +36,16 @@ app.all('/*splat', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on the server`, 404));
 });
 
-app.use((err, req, res, next) => {
-  err.statusCode = err.statusCode || 500;
-  err.status = err.status || 'error';
+app.use(errorController);
 
-  res.status(err.statusCode).json({
-    status: err.status,
-    message: err.message,
-  });
-});
+// app.use((err, req, res, next) => {
+//   err.statusCode = err.statusCode || 500;
+//   err.status = err.status || 'error';
+
+//   res.status(err.statusCode).json({
+//     status: err.status,
+//     message: err.message,
+//   });
+// });
 
 module.exports = app;
