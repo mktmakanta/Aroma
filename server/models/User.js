@@ -19,7 +19,6 @@ const userSchema = new mongoose.Schema(
       lowercase: true,
       validate: [validator.isEmail, 'Please provide a valid email'],
     },
-    // emailVerified: { type: Date },
     bio: String,
     password: {
       type: String,
