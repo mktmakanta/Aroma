@@ -38,6 +38,7 @@ const userSchema = new mongoose.Schema(
       },
       select: false,
     },
+    passwordChangedAt: Date, // password changed date
     role: {
       type: String,
       enum: {
@@ -54,6 +55,7 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+// -----------MIDDLEWARES-------------
 // ENCRYPT PASSWORD USING BCRYPT
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
@@ -63,6 +65,8 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// -----------INSTANCES-----------
+// CONFIRM PASSWORD
 userSchema.methods.matchPassword = async function (
   enteredPassword,
   userPassword // we cannot use this.password because select is false
@@ -70,6 +74,17 @@ userSchema.methods.matchPassword = async function (
   return await bcrypt.compare(enteredPassword, userPassword);
 };
 
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+// CHECK IF PASSWORD HAS BEING CHANGED
+userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
+  if (this.passwordChangedAt) {
+    const changedTimestamp = parseInt(
+      this.passwordChangedAt.getTime() / 1000,
+      10
+    );
+    return JWTTimestamp < changedTimestamp;
+  }
+  return false;
+};
 
+const User = mongoose.models.User || mongoose.model('User', userSchema);
 module.exports = User;

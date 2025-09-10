@@ -1,3 +1,5 @@
+const { promisify } = require('util');
+const AppError = require('../utils/appError');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const catchAsync = require('../utils/catchAsync');
@@ -64,16 +66,36 @@ exports.protect = catchAsync(async (req, res, next) => {
       new AppError('You are not logged in! Please log in to get access.', 401)
     );
   }
-
   //verify token
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
+  // check if user still exists in DB
   const currentUser = await User.findById(decoded.id);
   if (!currentUser) {
-    return next(new AppError('The user belonging to this token no longer exists.', 401));
-    
+    return next(
+      new AppError('The user belonging to this token no longer exists.', 401)
+    );
   }
 
+  // check if password is changed
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
+    return next(
+      new AppError('User recently changed password! Please login again', 401)
+    );
+  }
+
+  //  GRANT ACCESS
   req.user = currentUser;
   next();
 });
+
+exports.restrictTO = (...allowedRoles) => {
+  return (req, res, next) => {
+    if (!allowedRoles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action', 403)
+      );
+    }
+    next();
+  };
+};
