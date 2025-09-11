@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
@@ -11,7 +12,6 @@ const userSchema = new mongoose.Schema(
       maxlength: [50, 'Name must be less than 50 characters'],
       minlength: [2, 'Name must be at least 2 characters'],
     },
-
     email: {
       type: String,
       unique: true,
@@ -38,7 +38,14 @@ const userSchema = new mongoose.Schema(
       },
       select: false,
     },
-    passwordChangedAt: Date, // password changed date
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+    active: {
+      type: Boolean,
+      default: true,
+      select: false,
+    },
     role: {
       type: String,
       enum: {
@@ -55,13 +62,27 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// -----------MIDDLEWARES-------------
-// ENCRYPT PASSWORD USING BCRYPT
+// -----------MIDDLEWARES-----------
+// HASHING PASSWORD
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
 
   this.password = await bcrypt.hash(this.password, 12);
-  this.confirmPassword = undefined; // to remove confirmPassword field
+  this.confirmPassword = undefined;
+  next();
+});
+
+// SETTING PASSWORDCHANGEDAT PROPERTY
+userSchema.pre('save', function (next) {
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
+// QUERY MIDDLEWARE TO FILTER OUT INACTIVE USERS
+userSchema.pre(/^find/, function (next) {
+  this.find({ active: { $ne: false } });
   next();
 });
 
@@ -69,7 +90,7 @@ userSchema.pre('save', async function (next) {
 // CONFIRM PASSWORD
 userSchema.methods.matchPassword = async function (
   enteredPassword,
-  userPassword // we cannot use this.password because select is false
+  userPassword
 ) {
   return await bcrypt.compare(enteredPassword, userPassword);
 };
@@ -84,6 +105,20 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
     return JWTTimestamp < changedTimestamp;
   }
   return false;
+};
+
+// GENERATE PASSWORD RESET TOKEN
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+
+  return resetToken;
 };
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
