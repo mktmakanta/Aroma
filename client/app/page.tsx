@@ -1,10 +1,10 @@
-import ProductItems from './components/ProductItems';
+import Products from './components/Products';
 
 export default function Home() {
   return (
-    <div className="m-4">
-      dashboard
-      <ProductItems />
-    </div>
+    <main className="m-4">
+      <section className=" h-80 bg-orange-100 rounded-xl "></section>
+      <Products />
+    </main>
   );
 }

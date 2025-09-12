@@ -8,8 +8,9 @@ import {
   CardHeader,
 } from '@/components/ui/card';
 import ProductsLoader from '@/app/components/loaders/ProductsLoader';
-import RatingStars from '@/app/components/RatingStars';
+import RatingStars from '@/app/components/mini components/RatingStars';
 import { useQuery } from '@tanstack/react-query';
+import { StatusAlert } from './mini components/statusAlert';
 
 interface Product {
   _id: string;
@@ -28,18 +29,18 @@ async function fetchProducts() {
   return json.data.products; // extract the products array
 }
 
-const ProductItems = () => {
+const Products = () => {
   const { data, isLoading, error } = useQuery<Product[], Error>({
     queryKey: ['products'],
     queryFn: fetchProducts,
   });
 
   if (isLoading) return <ProductsLoader />;
-  if (error) return <div>Error: {error.message}</div>;
+  if (error) return <StatusAlert message={error.message} />;
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-      {data!.map((product) => (
+      {data?.map((product) => (
         <Card key={product._id} className="w-full max-w-xs mx-auto">
           <Link href={`/${product._id}`}>
             <CardHeader>
@@ -73,4 +74,4 @@ const ProductItems = () => {
   );
 };
 
-export default ProductItems;
+export default Products;

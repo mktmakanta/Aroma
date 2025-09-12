@@ -27,18 +27,20 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Menu */}
-          <div className="hidden md:flex space-x-4">
+          <div className="hidden md:flex space-x-4 align-middle">
             <Link
               href="/"
               className="text-black hover:text-red-600 transition-all duration-100 flex gap-2"
             >
-              <ShoppingCart /> Cart
+              <ShoppingCart />
             </Link>
 
             <Link
               href="/about"
-              className="text-black hover:text-red-600 transition-all duration-100 flex gap-2"
-            ></Link>
+              className="text-black  hover:text-red-600 transition-all duration-100 flex gap-2"
+            >
+              <div className="size-7 rounded-full bg-blue-400"></div>
+            </Link>
           </div>
 
           {/* Mobile Menu Button */}
