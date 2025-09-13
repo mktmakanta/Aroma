@@ -5,13 +5,13 @@ const {
   updateReview,
   deleteReview,
 } = require('../controllers/reviewControllers');
-// const { protect } = require('../middleware/authMiddleware'); // uncomment later for auth
+const authcontroller = require('./../controllers/authControllers');
 
 const router = express.Router();
-router.post('/', createReview); // later: [protect, createReview]
+router.post('/', authcontroller.protect, createReview);
 
 router.get('/product/:id', getReviewsByProduct);
-router.patch('/:id', updateReview); // later: [protect, updateReview]
-router.delete('/:id', deleteReview); // later: [protect, deleteReview]
+router.patch('/:id', authcontroller.protect, updateReview);
+router.delete('/:id', authcontroller.protect, deleteReview);
 
 module.exports = router;
