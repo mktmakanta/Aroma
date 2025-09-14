@@ -2,11 +2,6 @@ const mongoose = require('mongoose');
 
 const orderItemSchema = new mongoose.Schema(
   {
-    product: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-      required: true,
-    },
     quantity: {
       type: Number,
       min: 1,
@@ -16,9 +11,23 @@ const orderItemSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    product: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true,
+    },
+  },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
   { timestamps: true }
 );
+
+orderItemSchema.pre(/^find/, function (next) {
+  this.populate('product', 'name, description');
+  next();
+});
 
 const OrderItem =
   mongoose.models.OrderItem || mongoose.model('OrderItem', orderItemSchema);

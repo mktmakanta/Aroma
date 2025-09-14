@@ -92,9 +92,25 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
   });
 });
 
+// GET ME
+exports.getMe = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.user._id).select('-passwordChangedAt');
+
+  if (!user) {
+    return next(new AppError('User not found', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user,
+    },
+  });
+});
+
 // UPDATE CURRENT USER PROFILE(UPDATE ME)
 exports.updateMe = catchAsync(async (req, res, next) => {
-  // 1) Create error if user POSTs password data
+  // Create error if user POSTs password data
   if (req.body.password || req.body.confirmPassword) {
     return next(
       new AppError(

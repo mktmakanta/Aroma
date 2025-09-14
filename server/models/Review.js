@@ -2,17 +2,6 @@ const mongoose = require('mongoose');
 
 const reviewSchema = new mongoose.Schema(
   {
-    product: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Product',
-      require: true,
-    },
-
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
     comment: {
       type: String,
       trim: true,
@@ -24,9 +13,30 @@ const reviewSchema = new mongoose.Schema(
       min: 0,
       max: 5,
     },
+    product: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      require: true,
+    },
+
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+  },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
   },
   { timestamps: true }
 );
+
+reviewSchema.pre(/^find/, function (next) {
+  this.populate('user', 'name avatar')
+      //// .populate('product', 'name');
+  next();
+});
 
 const Review = mongoose.models.Review || mongoose.model('Review', reviewSchema);
 

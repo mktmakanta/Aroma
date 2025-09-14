@@ -19,11 +19,7 @@ exports.getProducts = catchAsync(async (req, res, next) => {
     .sort()
     .limitFields()
     .paginate();
-  const products = await features.query
-    .populate('user', 'name email')
-    .populate('reviews', 'comment rating')
-    .populate('categories', 'name')
-    .populate('tags', 'name');
+  const products = await features.query; //populated in the middleware
   res.status(200).json({
     status: 200,
     results: products.length,
@@ -35,11 +31,8 @@ exports.getProducts = catchAsync(async (req, res, next) => {
 
 // GET A PRODUCT BY ID
 exports.getProductById = catchAsync(async (req, res, next) => {
-  const product = await Product.findById(req.params.id)
-    .populate('user', 'name email')
-    .populate('categories', 'name')
-    .populate('reviews', 'comment rating')
-    .populate('tags', 'name');
+  const product = await Product.findById(req.params.id); //populated in middleware
+
   if (!product) {
     return next(new AppError('Could not find a product with that ID', 404));
   }
@@ -70,11 +63,8 @@ exports.updateProduct = catchAsync(async (req, res, next) => {
       new: true,
       runValidators: true,
     }
-  )
-    .populate('user', 'name email')
-    .populate('reviews', 'comment rating')
-    .populate('categories', 'name')
-    .populate('tags', 'name');
+  ); //populated
+
   if (!updatedProduct) {
     return res
       .status(404)

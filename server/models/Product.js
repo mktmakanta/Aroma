@@ -96,6 +96,10 @@ const productSchema = new mongoose.Schema(
       },
     ],
   },
+  {
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  },
   { timestamps: true }
 );
 
@@ -113,6 +117,14 @@ productSchema.pre('save', async function (next) {
     }
     this.slug = slug;
   }
+  next();
+});
+
+productSchema.pre(/^find/, function (next) {
+  this.populate('user', 'name email')
+    .populate('reviews', 'comment rating')
+    .populate('categories', 'name')
+    .populate('tags', 'name');
   next();
 });
 
