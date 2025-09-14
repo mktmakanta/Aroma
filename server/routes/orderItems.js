@@ -7,13 +7,16 @@ const {
   deleteOrderItem,
   updateOrderItem,
 } = require('../controllers/orderItemControllers');
+const authcontroller = require('../controllers/authControllers');
 
-router.route('/').get(getOrderItems).post(createOrderItem);
+router.use(authcontroller.protect);
 
-router
-  .route('/:id')
-  .get(getOrderItemById)
-  .delete(deleteOrderItem)
-  .patch(updateOrderItem);
+router.post('/', createOrderItem);
+router.get('/:id', getOrderItemById);
+
+router.use(authcontroller.restrictTO('admin')); // admin only
+
+router.get('/', getOrderItems);
+router.route('/:id').patch(updateOrderItem).delete(deleteOrderItem);
 
 module.exports = router;

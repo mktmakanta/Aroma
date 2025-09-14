@@ -19,7 +19,7 @@ exports.getProducts = catchAsync(async (req, res, next) => {
     .sort()
     .limitFields()
     .paginate();
-  const products = await features.query; //populated in the middleware
+  const products = await features.query.explain(); //populated in the middleware
   res.status(200).json({
     status: 200,
     results: products.length,

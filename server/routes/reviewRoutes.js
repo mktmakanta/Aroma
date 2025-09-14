@@ -10,21 +10,15 @@ const authcontroller = require('./../controllers/authControllers');
 
 const router = express.Router();
 
-router.get('/', getAllReviews);
+router.use(authcontroller.protect); // Protected
 
+router.delete('/:id', deleteReview);
 router.get('/product/:id', getReviewsByProduct);
-router.post(
-  '/:productId',
-  authcontroller.protect,
-  authcontroller.restrictTO('user'),
-  createReview
-); //only the users can add review
-router.patch(
-  '/:id',
-  authcontroller.protect,
-  authcontroller.restrictTO('user'),
-  updateReview
-);
-router.delete('/:id', authcontroller.protect, deleteReview);
+
+router.post('/:productId', authcontroller.restrictTO('user'), createReview); //only the users can add review
+router.patch('/:id', authcontroller.restrictTO('user'), updateReview);
+
+router.use(authcontroller.restrictTO('admin'))
+router.get('/', getAllReviews); // Admin can view all reviews on all products
 
 module.exports = router;

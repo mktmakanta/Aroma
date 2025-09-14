@@ -103,7 +103,11 @@ const productSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// ----------MONGOOSE DOCUMENT MIDDLEWARE------------ (We can have pre-save, OR post-save,  Next should always be called)
+// ----------INDEXES-----------
+productSchema.index({ slug: 1 }); // unique or single index
+productSchema.index({ price: 1, countInStock: -1 }); // compound
+
+// ----------MONGOOSE DOCUMENT MIDDLEWARE------------
 productSchema.pre('save', async function (next) {
   if (this.isModified('name')) {
     let baseSlug = slugify(this.name, { lower: true, strict: true });

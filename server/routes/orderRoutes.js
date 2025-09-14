@@ -7,13 +7,17 @@ const {
   updateOrderStatus,
   deleteOrder,
 } = require('./../controllers/orderControllers');
+const authcontroller = require('./../controllers/authControllers');
 
-router.route('/').get(getOrders).post(createOrder);
+router.use(authcontroller.protect);
 
-router
-  .route('/:id')
-  .get(getOrderById)
-  .patch(updateOrderStatus)
-  .delete(deleteOrder);
+router.post('/', createOrder);
+router.get('/:id', getOrderById);
+
+router.use(authcontroller.restrictTO('admin'));
+
+router.get('/', getOrders);
+router.patch('/:id', updateOrderStatus);
+router.delete('/:id', deleteOrder);
 
 module.exports = router;

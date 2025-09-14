@@ -1,7 +1,9 @@
 const express = require('express');
-const categoryController = require('../controllers/categoryControllers');
-
 const router = express.Router();
+const categoryController = require('../controllers/categoryControllers');
+const authcontroller = require('../controllers/authControllers');
+
+router.use(authcontroller.restrictTO('admin'));
 
 router
   .route('/')

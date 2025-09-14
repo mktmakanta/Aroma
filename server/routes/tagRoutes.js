@@ -1,10 +1,12 @@
 const express = require('express');
 const tagController = require('../controllers/tagControllers');
+const authController = require('../controllers/authControllers');
 
 const router = express.Router();
 
-router.route('/').post(tagController.createTag).get(tagController.getTags);
+router.use(authController.restrictTO('admin'));
 
+router.route('/').post(tagController.createTag).get(tagController.getTags);
 router
   .route('/:id')
   .get(tagController.getTagById)

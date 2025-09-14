@@ -25,6 +25,7 @@ class APIFeatures {
     }
     return this;
   }
+
   limitFields() {
     if (this.queryString.fields) {
       const fields = this.queryString.fields.split(',').join(' ');
