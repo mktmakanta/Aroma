@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import RatingStars from '@/app/components/mini components/RatingStars';
+import RatingStars from '@/app/components/miniComponents/RatingStars';
 
 type Product = {
   id: string;

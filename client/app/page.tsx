@@ -1,10 +1,13 @@
-import Products from './components/Products';
+import Hero from './components/Hero';
+import Newsletter from './components/NewsLetter';
+import ProductsPage from './components/ProductsPage';
 
 export default function Home() {
   return (
-    <main className="m-4">
-      <section className=" h-80 bg-orange-100 rounded-xl "></section>
-      <Products />
+    <main className="">
+      <Hero />
+      <ProductsPage />
+      <Newsletter />
     </main>
   );
 }
