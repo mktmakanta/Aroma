@@ -94,7 +94,9 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
 // GET ME
 exports.getMe = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user._id).select('-passwordChangedAt');
+  const user = await User.findById(req.user._id).select(
+    '-passwordChangedAt -createdAt -updatedAt '
+  );
 
   if (!user) {
     return next(new AppError('User not found', 404));

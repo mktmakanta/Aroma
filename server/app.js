@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
 const helmet = require('helmet');
 const hpp = require('hpp');
@@ -22,7 +23,12 @@ const app = express();
 
 // ----------MIDDLEWARES-------------
 // These middlewares are arranged hierrachically according to best practice and use
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || true,
+    credentials: true,
+  })
+);
 
 app.use(
   helmet({
@@ -42,6 +48,9 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again in an hour!',
 });
 app.use('/api', limiter);
+
+// cookie parser
+app.use(cookieParser());
 
 app.use(express.json({ limit: '10kb' })); // parse requests
 

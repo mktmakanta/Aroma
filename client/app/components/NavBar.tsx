@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Gem, Menu, ShoppingCart, User, X } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 import SearchAndNav from './miniComponents/SearchAndNav';
 import SearchBarMobile from './miniComponents/SearchBarMobile';
+import { CurrentUserStatus } from './CurrentUserStatus';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -42,15 +42,7 @@ const Navbar = () => {
                 <ShoppingCart />
               </Link>
 
-              <Link
-                href="/about"
-                className="text-black  hover:text-red-600 transition-all duration-100 flex gap-2"
-              >
-                <Avatar>
-                  <AvatarImage src="https://github.com/shadcn.png" />
-                  <AvatarFallback>CN</AvatarFallback>
-                </Avatar>
-              </Link>
+              <CurrentUserStatus />
             </div>
 
             {/* Mobile Menu Button */}

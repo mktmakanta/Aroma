@@ -1,13 +1,9 @@
-import Hero from './components/Hero';
-import Newsletter from './components/NewsLetter';
-import ProductsPage from './components/ProductsPage';
+import Home from './(public)/products/page';
 
-export default function Home() {
+export default function RootPage() {
   return (
     <main className="">
-      <Hero />
-      <ProductsPage />
-      <Newsletter />
+      <Home />
     </main>
   );
 }

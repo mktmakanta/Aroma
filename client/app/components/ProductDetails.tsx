@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import RatingStars from '@/app/components/miniComponents/RatingStars';
+import Router from 'next/router';
 
 type Product = {
   id: string;
@@ -29,8 +30,8 @@ const ProductDetails = ({ productdetails }: ProductDetailsProps) => {
     <div className="max-w-7xl mx-auto space-y-10 md:mt-8">
       <Link href="/">
         <Button
-          className="group text-black bg-orange-100/75 hover:bg-orange-200 transition-all duration-200 ring-1 ring-orange-200/75"
-          // onClick={() => router.back()}
+          className="group text-black bg-orange-100/75 mb-10 hover:bg-orange-200 transition-all duration-200 ring-1 ring-orange-200/75"
+          onClick={() => Router.back()}
         >
           <ArrowLeft className="group-hover:-translate-x-1 transition-all duration-200" />
           Go Back
@@ -43,7 +44,7 @@ const ProductDetails = ({ productdetails }: ProductDetailsProps) => {
             {/* Product Image */}
             <div>
               <Image
-                src={`/images/perfumes/${product.image}.jpg`}
+                src={product.image || '/images/perfumes/perfume10.jpg'}
                 alt={product.name}
                 width={300}
                 height={300}
