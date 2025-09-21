@@ -44,7 +44,7 @@ const userSchema = new mongoose.Schema(
     active: {
       type: Boolean,
       default: true,
-      select: false,
+      // select: false,
     },
     role: {
       type: String,
@@ -81,10 +81,17 @@ userSchema.pre('save', function (next) {
 });
 
 // QUERY MIDDLEWARE TO FILTER OUT INACTIVE USERS
-userSchema.pre(/^find/, function (next) {
-  this.find({ active: { $ne: false } });
-  next();
-});
+// userSchema.pre(/^find/, function (next) {
+//   this.find({ active: { $ne: false } });
+//   next();
+// });
+
+//use this instead
+// Add a query helper for active users
+userSchema.query.activeOnly = function () {
+  return this.find({ active: { $ne: false } });
+};
+//so when querying for only active users, const users = await User.find().activeOnly();
 
 // -----------INSTANCES-----------
 // CONFIRM PASSWORD

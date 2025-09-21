@@ -8,9 +8,9 @@ export default function UsersLayout({
 }>) {
   return (
     <>
-      <Navbar />
+      {/* <Navbar /> */}
       {children}
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

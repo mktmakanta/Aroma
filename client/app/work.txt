@@ -1,0 +1,36 @@
+Here's what should typically be included in each section:
+Dashboard/Account
+Overview & Quick Actions:
+
+Welcome message with user name
+Account summary (recent orders, points/credits)
+Quick stats (total orders, saved items, etc.)
+Recent activity feed
+Shortcuts to most-used features
+Order status updates
+Personalized recommendations
+
+Orders
+Order Management:
+
+Order history (with search/filter by date, status)
+Order details (items, quantities, prices)
+Order status tracking
+Shipping information & tracking numbers
+Download invoices/receipts
+Reorder functionality
+Return/exchange requests
+Cancel orders (if applicable)
+Print shipping labels for returns
+
+Settings
+Account Management:
+
+Profile: Name, email, phone, profile picture
+Addresses: Shipping & billing addresses, default settings
+Payment Methods: Saved cards, PayPal, digital wallets
+Security: Change password, two-factor authentication
+Notifications: Email/SMS preferences for orders, promotions
+Privacy: Data preferences, marketing consent
+Preferences: Language, currency, default shipping options
+Account Actions: Delete account, export data

@@ -63,13 +63,43 @@ exports.signup = catchAsync(async (req, res, next) => {
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
-  const user = await User.findOne({ email }).select('+password');
-  if (user && (await user.matchPassword(password, user.password))) {
-    createSignToken(user, 200, res);
-  } else {
+  const user = await User.findOne({ email }).select('+password +active');
+
+  if (!user) {
+    return next(new AppError('Invalid Email or Password', 401));
+  }
+
+  if (!user.active) {
+    return next(
+      new AppError(
+        'This account has been deactivated. Please contact support.',
+        403
+      )
+    );
+  }
+
+  const isMatch = await user.matchPassword(password, user.password);
+  if (!isMatch) {
     return next(new AppError('Invalid Email or Password', 401));
   }
 });
+
+exports.logout = (req, res, next) => {
+  try {
+    res.cookie('jwt', '', {
+      expires: new Date(Date.now() + 10 * 1000),
+      httpOnly: true,
+      sameSite: 'lax',
+    });
+    res.status(200).json({ status: 'success' });
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      message:
+        'Something went wrong while logging out. Please try again later.',
+    });
+  }
+};
 
 // PROTECT ROUTES
 exports.protect = catchAsync(async (req, res, next) => {

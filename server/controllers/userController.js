@@ -94,9 +94,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
 // GET ME
 exports.getMe = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user._id).select(
-    '-passwordChangedAt -createdAt -updatedAt '
-  );
+  const user = await User.findById(req.user._id).select('-passwordChangedAt  ');
 
   if (!user) {
     return next(new AppError('User not found', 404));
@@ -121,7 +119,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
       )
     );
   }
-  const filteredBody = filteredObj(req.body, 'name', 'email', 'bio');
+  const filteredBody = filteredObj(req.body, 'name', 'email', 'bio', 'avatar');
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
     runValidators: true,

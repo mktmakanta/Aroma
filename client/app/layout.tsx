@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
-import Footer from './components/Footer';
-import QueryProvider from './providers/reactQueryProvider';
+// import Footer from './components/Footer';
+
 import { AuthProvider } from './providers/AuthContext';
+import QueryProvider from './providers/reactQueryProvider';
 
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
@@ -14,6 +15,11 @@ const geistMono = localFont({
   src: './fonts/GeistMonoVF.woff',
   variable: '--font-geist-mono',
   weight: '100 900',
+});
+const bebas = localFont({
+  src: './fonts/BebasNeue-Regular.ttf',
+  variable: '--font-bebas',
+  weight: '400',
 });
 
 export const metadata: Metadata = {
@@ -29,13 +35,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${bebas.variable} antialiased`}
       >
         <QueryProvider>
           <AuthProvider>{children}</AuthProvider>
         </QueryProvider>
       </body>
-      <Footer />
+      {/* <Footer /> */}
     </html>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Navbar from './NavBar';
 
 const images = [
   '/images/hero/hero-1.jpg', // replace with your actual image paths
@@ -21,6 +22,7 @@ const Hero = () => {
 
   return (
     <div className="relative w-full h-[90vh] overflow-hidden">
+      <Navbar />
       {images.map((src, index) => (
         <div
           key={index}

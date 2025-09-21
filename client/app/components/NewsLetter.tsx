@@ -78,12 +78,12 @@ const Newsletter = () => {
           </p>
           <div className="flex gap-4">
             <img
-              src="/images/appstore.png"
+              src="/assets/appstore.png"
               alt="App Store"
               className="h-10 cursor-pointer"
             />
             <img
-              src="/images/googleplay.png"
+              src="/assets/playstore.png"
               alt="Google Play"
               className="h-10 cursor-pointer"
             />
