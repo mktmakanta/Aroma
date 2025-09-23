@@ -1,9 +1,12 @@
+const multer = require('multer');
+const sharp = require('sharp');
+const path = require('path');
+const fs = require('fs');
 const User = require('../models/User');
 const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 
-// filter object for update me user
 const filteredObj = (obj, ...allowedFields) => {
   const newObj = {};
   Object.keys(obj).forEach((el) => {
@@ -94,7 +97,7 @@ exports.deleteUser = catchAsync(async (req, res, next) => {
 
 // GET ME
 exports.getMe = catchAsync(async (req, res, next) => {
-  const user = await User.findById(req.user._id).select('-passwordChangedAt  ');
+  const user = await User.findById(req.user._id);
 
   if (!user) {
     return next(new AppError('User not found', 404));
@@ -108,18 +111,57 @@ exports.getMe = catchAsync(async (req, res, next) => {
   });
 });
 
+// MULTER and SHARP FOR AVATAR UPLOAD
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Not an image! Please upload only images.'), false);
+  }
+};
+
+exports.uploadUserAvatar = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+}).single('avatar');
+
+exports.resizeUserAvatar = async (req, res, next) => {
+  if (!req.file) return next();
+
+  req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
+
+  try {
+    await sharp(req.file.buffer)
+      .resize(500, 500)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(
+        path.join(__dirname, '../public/images/users', req.file.filename)
+      );
+  } catch (err) {
+    console.error('Sharp error:', err);
+    return next(err);
+  }
+
+  next();
+};
+
 // UPDATE CURRENT USER PROFILE(UPDATE ME)
 exports.updateMe = catchAsync(async (req, res, next) => {
-  // Create error if user POSTs password data
   if (req.body.password || req.body.confirmPassword) {
     return next(
       new AppError(
-        'This route is not for password updates. Please use /update-my-password.',
+        'This route is not for password updates. Please use update-my-password.',
         400
       )
     );
   }
-  const filteredBody = filteredObj(req.body, 'name', 'email', 'bio', 'avatar');
+
+  const filteredBody = filteredObj(req.body, 'name', 'email', 'bio');
+  if (req.file) filteredBody.avatar = req.file.filename;
+
   const updatedUser = await User.findByIdAndUpdate(req.user.id, filteredBody, {
     new: true,
     runValidators: true,

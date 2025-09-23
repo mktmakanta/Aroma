@@ -1,5 +1,6 @@
 'use client';
-
+import Link from 'next/link';
+import Image from 'next/image';
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
@@ -12,13 +13,12 @@ import {
 import ProductsLoader from '@/app/components/loaders/ProductsLoader';
 import RatingStars from '@/app/components/miniComponents/RatingStars';
 import { StatusAlert } from './miniComponents/statusAlert';
-import Link from 'next/link';
-import Image from 'next/image';
 
 interface Product {
   _id: string;
   name: string;
   image: string;
+  slug: string;
   description: string;
   price: number;
   rating: number;
@@ -62,7 +62,7 @@ const ProductsPage = () => {
           placeholder="Search..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="border p-2 rounded-md flex-1"
+          className="border p-2 flex-1"
         />
 
         <input
@@ -70,13 +70,13 @@ const ProductsPage = () => {
           placeholder="Max Price"
           value={maxPrice}
           onChange={(e) => setMaxPrice(e.target.value)}
-          className="border p-2 rounded-md w-32"
+          className="border p-2  w-32"
         />
 
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value)}
-          className="border p-2 rounded-md"
+          className="border p-2 "
         >
           <option value="">Sort by</option>
           <option value="price">Price: Lowest</option>
@@ -88,15 +88,18 @@ const ProductsPage = () => {
       {/* Products Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {data?.map((product) => (
-          <Card key={product._id} className="w-full">
-            <Link href={`/products/${product._id}`}>
-              <CardHeader>
+          <Card
+            key={product._id}
+            className="w-full border rounded-none bg-orange-100"
+          >
+            <Link href={`/products/${product.slug}`}>
+              <CardHeader className="">
                 <Image
                   src={product.image || '/images/perfumes/perfume10.jpg'}
                   alt={product.name}
                   width={300}
                   height={200}
-                  className="w-full h-56 object-cover rounded-md"
+                  className="w-full h-56 object-cover "
                 />
               </CardHeader>
               <CardContent className="p-4">
@@ -126,14 +129,14 @@ const ProductsPage = () => {
         <button
           onClick={() => setPage((p) => Math.max(p - 1, 1))}
           disabled={page === 1}
-          className="px-4 py-2 border rounded-md disabled:opacity-50"
+          className="px-4 py-2 border  disabled:opacity-50"
         >
           Prev
         </button>
         <span className="px-4 py-2">{page}</span>
         <button
           onClick={() => setPage((p) => p + 1)}
-          className="px-4 py-2 border rounded-md"
+          className="px-4 py-2 border "
         >
           Next
         </button>

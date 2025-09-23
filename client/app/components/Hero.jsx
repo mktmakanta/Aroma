@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Navbar from './NavBar';
 
 const images = [
-  '/images/hero/hero-1.jpg', // replace with your actual image paths
+  '/images/hero/hero-1.jpg',
   '/images/hero/hero-2.jpg',
   '/images/hero/hero-3.jpg',
 ];
@@ -12,7 +11,6 @@ const images = [
 const Hero = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Auto slide every 4s
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
@@ -21,8 +19,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <div className="relative w-full h-[90vh] overflow-hidden">
-      <Navbar />
+    <div className="relative w-full h-[70vh] overflow-hidden">
       {images.map((src, index) => (
         <div
           key={index}
@@ -38,12 +35,10 @@ const Hero = () => {
         </div>
       ))}
 
-      {/* Overlay content (optional) */}
       <div className="absolute inset-0 flex items-center justify-center bg-black/40 text-white text-3xl md:text-5xl font-bold">
         Welcome to Our Store
       </div>
 
-      {/* Dots Indicator */}
       <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 flex gap-2">
         {images.map((_, index) => (
           <button

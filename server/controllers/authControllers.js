@@ -34,18 +34,26 @@ const createSignToken = (user, statusCode, res) => {
 
 // SIGNUP
 exports.signup = catchAsync(async (req, res, next) => {
-  const newUser = req.body;
+  const { name, email, password, confirmPassword } = req.body;
 
-  // Only allow specific fields to be set
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    return next(
+      new AppError(
+        'Email is already registered. Please use a different email or login.',
+        400
+      )
+    );
+  }
+
   const user = await User.create({
-    name: newUser.name,
-    email: newUser.email,
-    password: newUser.password,
-    confirmPassword: newUser.confirmPassword,
+    name,
+    email,
+    password,
+    confirmPassword,
   });
 
-  const token = signToken(user._id);
-
+  createSignToken(user, 200, res);
   // Exclude password fields from response
   const userResponse = user.toObject();
   delete userResponse.password;
@@ -82,6 +90,7 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!isMatch) {
     return next(new AppError('Invalid Email or Password', 401));
   }
+  createSignToken(user, 200, res);
 });
 
 exports.logout = (req, res, next) => {

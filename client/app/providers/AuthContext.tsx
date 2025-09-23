@@ -13,6 +13,7 @@ type User = {
   avatar?: string;
   createdAt?: string;
   updatedAt?: string;
+  passwordChangedAt: string;
 };
 
 type AuthContextType = {

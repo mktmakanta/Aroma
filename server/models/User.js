@@ -56,7 +56,7 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default: 'https://ui-avatars.com/api/?name=User&background=random',
+      default: 'user-68d1b15374cd7734e7dc89d9-1758573039188.jpeg',
     },
   },
   { timestamps: true }

@@ -1,34 +1,37 @@
 'use client';
 
 import { useParams, useRouter } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import ProductDetailsLoader from '@/app/components/loaders/ProductDetailsLoader';
 import ProductDetails from '@/app/components/ProductDetails';
 import { Product } from '@/Types/globalTypes';
 
-const fetchProduct = async (id: string): Promise<Product> => {
-  const res = await fetch(`http://localhost:5000/api/v1/products/${id}`, {
-    credentials: 'include', // send cookies if needed
+const fetchProduct = async (slug: string): Promise<Product> => {
+  const res = await fetch(`http://localhost:5000/api/v1/products/${slug}`, {
+    credentials: 'include',
   });
 
   if (res.status === 401) {
     throw new Error('Unauthorized');
   }
+  console.log(res);
   if (!res.ok) {
     throw new Error('Failed to fetch product');
   }
 
   const data = await res.json();
 
-  if (data?.data?.product) {
-    return data.data.product;
+  if (!data?.data?.product) {
+    notFound();
   }
-  throw new Error('No product found');
+
+  return data?.data?.product;
 };
 
 const ProductPage = () => {
-  const params = useParams();
-  const id = params.id as string;
+  const params = useParams<{ slug: string }>();
+  const slug = params.slug as string;
   const router = useRouter();
 
   const {
@@ -37,9 +40,9 @@ const ProductPage = () => {
     isError,
     error,
   } = useQuery<Product, Error>({
-    queryKey: ['product', id],
-    queryFn: () => fetchProduct(id),
-    enabled: !!id,
+    queryKey: ['product', slug],
+    queryFn: () => fetchProduct(slug),
+    enabled: !!slug,
   });
 
   if (isLoading) return <ProductDetailsLoader />;

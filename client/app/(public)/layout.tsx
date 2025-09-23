@@ -1,4 +1,3 @@
-import Footer from '../components/Footer';
 import Navbar from '../components/NavBar';
 
 export default function UsersLayout({
@@ -8,9 +7,8 @@ export default function UsersLayout({
 }>) {
   return (
     <>
-      {/* <Navbar /> */}
+      <Navbar />
       {children}
-      {/* <Footer /> */}
     </>
   );
 }

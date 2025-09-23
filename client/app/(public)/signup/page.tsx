@@ -9,10 +9,9 @@ import { useQueryClient } from '@tanstack/react-query';
 import {
   // CheckCircle,
   AlertTriangle,
+  CheckCircle,
   Eye,
   EyeOff,
-  UserRound,
-  X,
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -51,7 +50,7 @@ export default function SignUpPage() {
     try {
       const res = await fetch('http://localhost:5000/api/v1/users/signup', {
         method: 'POST',
-        credentials: 'include', // ensures cookie is set
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, confirmPassword }),
       });
@@ -63,10 +62,9 @@ export default function SignUpPage() {
 
       setStatus('success');
 
-      // ✅ Refetch user immediately after signup
       await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
 
-      setTimeout(() => router.push('/products'), 1000);
+      setTimeout(() => router.push('/'), 1000);
     } catch (err: any) {
       setStatus('error');
       setErrorMessage(err.message || 'Something went wrong.');
@@ -90,16 +88,6 @@ export default function SignUpPage() {
 
       <div className="flex w-full md:w-1/2 items-center justify-center bg-[#b8a18c] p-6">
         <div className="w-full max-w-md space-y-5 bg-[#b8a18c] text-white">
-          <div className=" flex justify-between items-center text-xs h-10 w-full mb-20  text-white">
-            <div className="flex items-center space-x-2">
-              <UserRound />
-              <h3>NEW ACCOUNT</h3>
-            </div>
-            <Link href="/" className="hover:text-[#d1bead] cursor-pointer">
-              <X />
-            </Link>
-          </div>
-
           <div className="flex justify-between text-5xl">
             <h2 className=" font-semibold font-geist ">Sign Up</h2>
             <Link href="/login">
@@ -111,7 +99,15 @@ export default function SignUpPage() {
           <p className="text-sm text-white/80">
             Sign up for an account using email and password
           </p>
-
+          {status === 'success' && (
+            <Alert className="border-green-500 bg-green-100 text-green-800">
+              <CheckCircle className="h-3 w-4" />
+              <AlertTitle>Success</AlertTitle>
+              <AlertDescription>
+                You have successfully signed up.
+              </AlertDescription>
+            </Alert>
+          )}
           {status === 'error' && (
             <Alert
               variant="destructive"

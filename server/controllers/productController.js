@@ -29,12 +29,12 @@ exports.getProducts = catchAsync(async (req, res, next) => {
   });
 });
 
-// GET A PRODUCT BY ID
-exports.getProductById = catchAsync(async (req, res, next) => {
-  const product = await Product.findById(req.params.id); //populated in middleware
+// GET A PRODUCT BY SLUG
+exports.getProductBySlug = catchAsync(async (req, res, next) => {
+  const product = await Product.findById(req.params.slug); //populated in middleware
 
   if (!product) {
-    return next(new AppError('Could not find a product with that ID', 404));
+    return next(new AppError('Could not find a product with that name', 404));
   }
   res.status(200).json({
     status: 'success',

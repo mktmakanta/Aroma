@@ -12,7 +12,7 @@ import {
 } from '@/app/components/ui/card';
 import { Badge } from '@/app/components/ui/badge';
 import Image from 'next/image';
-import DeleteAProduct from '../../_componnents/DeleteAProduct';
+import DeleteAProduct from '../../../../../app/(admin)/_componnents/DeleteAProduct';
 import { Button } from '@/app/components/ui/button';
 import Link from 'next/link';
 

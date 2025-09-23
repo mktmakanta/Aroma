@@ -1,5 +1,5 @@
-import React from "react";
-import UpdateProduct from "../../../_componnents/UpdateProduct";
+import React from 'react';
+import UpdateProduct from '../../../../../../app/(admin)/_componnents/UpdateProduct';
 
 const page = ({ params }: { params: { id: string } }) => {
   const { id } = params;

@@ -11,6 +11,7 @@ type Product = {
   id: string;
   name: string;
   image: string;
+  slug: string;
   description: string;
   price: number;
   rating: number;
@@ -24,13 +25,13 @@ type ProductDetailsProps = {
 };
 
 const ProductDetails = ({ productdetails }: ProductDetailsProps) => {
-  // const router = useRouter();X
+  // const router = useRouter();
 
   return (
     <div className="max-w-7xl mx-auto space-y-10 md:mt-8">
       <Link href="/">
         <Button
-          className="group text-black bg-orange-100/75 mb-10 hover:bg-orange-200 transition-all duration-200 ring-1 ring-orange-200/75"
+          className="group rounded-none text-black bg-orange-100/75 mb-10 hover:bg-orange-200 transition-all duration-200 ring-1 ring-black"
           onClick={() => Router.back()}
         >
           <ArrowLeft className="group-hover:-translate-x-1 transition-all duration-200" />
@@ -41,14 +42,13 @@ const ProductDetails = ({ productdetails }: ProductDetailsProps) => {
       {productdetails.length > 0 ? (
         productdetails.map((product) => (
           <div key={product.id} className="flex flex-col md:flex-row gap-5">
-            {/* Product Image */}
-            <div>
+            <div className="border">
               <Image
                 src={product.image || '/images/perfumes/perfume10.jpg'}
                 alt={product.name}
                 width={300}
                 height={300}
-                className="rounded-lg shadow-lg h-[25rem] lg:h-[30rem] lg:w-[26rem]"
+                className=" shadow-lg h-[25rem] lg:h-[30rem] lg:w-[26rem]"
               />
             </div>
 
@@ -69,8 +69,7 @@ const ProductDetails = ({ productdetails }: ProductDetailsProps) => {
                 <p className="pt-3">{product.description}</p>
               </div>
 
-              {/* Additional Details */}
-              <div className="md:w-[300px] space-y-3 p-4 ring-1 ring-orange-100 shadow-sm rounded-md divide-y divide-orange-100 max-h-min">
+              <div className="md:w-[300px] space-y-3 p-4 ring-1 ring-black shadow-sm  divide-y divide-black gap-2 max-h-min">
                 <p className="flex items-center justify-between">
                   <span className="font-semibold">Category:</span>
                   {product.category}
@@ -85,7 +84,7 @@ const ProductDetails = ({ productdetails }: ProductDetailsProps) => {
                       : 'Out of Stock'}
                   </span>
                 </div>
-                <Button className="mt-6 text-orange-100 hover:text-red-500 rounded-sm transition">
+                <Button className="mt-6 bg-orange-100 border hover:bg-orange-200 rounded-none transition">
                   Add to Cart
                 </Button>
               </div>

@@ -5,16 +5,8 @@ import { useAuth } from '@/app/providers/AuthContext';
 import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { CircleUserRound } from 'lucide-react';
 
-export const CurrentUserStatus = () => {
+export const MobileDropdown = () => {
   const { user, isLoading, setUser } = useAuth();
   const router = useRouter();
   const [loggingOut, setLoggingOut] = useState(false);
@@ -70,13 +62,10 @@ export const CurrentUserStatus = () => {
         <div className="relative" ref={dropdownRef}>
           <button
             onClick={toggleDropdown}
-            className="w-8 h-8 rounded-full cursor-pointer hover:ring-2 hover:ring-gray-300 transition-all"
+            className="w-5 h-5 rounded-full cursor-pointer hover:ring-2 hover:ring-gray-300 transition-all"
           >
             <Avatar>
-              <AvatarImage
-                src={`http://localhost:5000/public/images/users/${user.avatar}`}
-                alt="User dropdown"
-              />
+              <AvatarImage src={user.avatar} alt="User dropdown" />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
           </button>
@@ -121,18 +110,6 @@ export const CurrentUserStatus = () => {
                   Settings
                 </Link>
               </li>
-
-              {user.role === 'admin' && (
-                <li>
-                  <Link
-                    href="/admin"
-                    className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white transition-colors"
-                    onClick={() => setDropdownOpen(false)}
-                  >
-                    Admin
-                  </Link>
-                </li>
-              )}
             </ul>
 
             <div className="py-1">
@@ -147,33 +124,17 @@ export const CurrentUserStatus = () => {
           </div>
         </div>
       ) : (
-        <div>
-          <div className="hidden md:flex space-x-4 font-mono font-bold">
-            <Link href="/signup" className="hidden md:block">
-              <span className="text-gray-950 transition-all duration-100 hover:text-gray-700 cursor-pointer">
-                Sign up
-              </span>
-            </Link>
-            <Link href="/login" className="hidden md:block">
-              <span className="p-3 px-5  bg-gray-950 text-white transition-all duration-100 hover:bg-gray-900 cursor-pointer">
-                Login
-              </span>
-            </Link>
-          </div>
-          <div className="md:hidden  font-mono font-bold">
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <div className="">
-                  <CircleUserRound />
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Login</DropdownMenuItem>
-                <DropdownMenuItem>Signup</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+        <div className="flex space-x-4 font-mono font-bold">
+          <Link href="/signup" className=" block md:hidden">
+            <span className="text-gray-950 transition-all duration-100 hover:text-gray-700 cursor-pointer">
+              Sign up
+            </span>
+          </Link>
+          <Link href="/login" className="md:hidden">
+            <span className="p-3 px-5  bg-gray-950 text-white transition-all duration-100 hover:bg-gray-900 cursor-pointer">
+              Login
+            </span>
+          </Link>
         </div>
       )}
     </>

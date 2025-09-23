@@ -10,14 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import {
-  CheckCircle,
-  AlertTriangle,
-  Eye,
-  EyeOff,
-  UserRound,
-  X,
-} from 'lucide-react';
+import { CheckCircle, AlertTriangle, Eye, EyeOff } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -50,14 +43,14 @@ export default function LoginPage() {
       }
 
       setStatus('success');
-
-      // ✅ Refetch user immediately
+      setEmail('');
+      setPassword('');
       await queryClient.invalidateQueries({ queryKey: ['currentUser'] });
 
       setTimeout(() => router.push('/'), 1000);
     } catch (err) {
       setStatus('error');
-      setErrorMessage(err.message); // show backend error message
+      setErrorMessage(err.message);
     } finally {
       setLoading(false);
     }
@@ -78,15 +71,6 @@ export default function LoginPage() {
 
       <div className="flex w-full md:w-1/2 items-center justify-center bg-[#b8a18c] p-6">
         <div className="w-full max-w-md space-y-6 bg-[#b8a18c] text-white">
-          <div className=" flex justify-between items-center text-sm h-10 w-full mb-24  text-white">
-            <div className="flex items-center space-x-2">
-              <UserRound />
-              <h3>MY ACCOUNT</h3>
-            </div>
-            <Link href="/" className="hover:text-[#d1bead] cursor-pointer">
-              <X />
-            </Link>
-          </div>
           <div className="flex justify-between text-5xl">
             <h2 className=" font-semibold font-geist ">Login</h2>
             <Link href="/signup">

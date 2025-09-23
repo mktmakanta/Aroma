@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
-// import Footer from './components/Footer';
 
 import { AuthProvider } from './providers/AuthContext';
 import QueryProvider from './providers/reactQueryProvider';
@@ -41,7 +40,6 @@ export default function RootLayout({
           <AuthProvider>{children}</AuthProvider>
         </QueryProvider>
       </body>
-      {/* <Footer /> */}
     </html>
   );
 }

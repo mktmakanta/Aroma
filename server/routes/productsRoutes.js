@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {
   getProducts,
-  getProductById,
+  getProductBySlug,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -19,7 +19,7 @@ router.route('/top-5-products').get(topProducts, getProducts);
 
 router.use(protect); // logged in user
 
-router.route('/:id').get(getProductById);
+router.route('/:slug').get(getProductBySlug);
 
 router.use(restrictTO('admin')); // admin only
 

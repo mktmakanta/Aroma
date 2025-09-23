@@ -1,4 +1,4 @@
-import Home from './(public)/products/page';
+import Home from './products/page';
 
 export default function RootPage() {
   return (

@@ -1,4 +1,6 @@
 const express = require('express');
+const path = require('path');
+const fs = require('fs');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const morgan = require('morgan');
@@ -23,6 +25,8 @@ const app = express();
 
 // ----------MIDDLEWARES-------------
 // These middlewares are arranged hierrachically according to best practice and use
+app.use('/public', express.static(path.join(__dirname, 'public')));
+
 app.use(
   cors({
     origin: process.env.FRONTEND_URL || true,
@@ -54,7 +58,12 @@ app.use(cookieParser());
 
 app.use(express.json({ limit: '10kb' })); // parse requests
 
-app.use(expressMongoSanitize()); // https://github.com/ExorTek/express-mongo-sanitize || older version is throwing error
+app.use(
+  expressMongoSanitize({
+    sanitizeObjects: ['query', 'params'],
+    deniedKeys: ['role'],
+  })
+); // https://github.com/ExorTek/express-mongo-sanitize || older version is throwing error
 
 app.use(xss());
 
