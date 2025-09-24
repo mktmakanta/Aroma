@@ -17,7 +17,7 @@ import { StatusAlert } from './miniComponents/statusAlert';
 interface Product {
   _id: string;
   name: string;
-  image: string;
+  imageCover: string;
   slug: string;
   description: string;
   price: number;
@@ -43,7 +43,7 @@ const ProductsPage = () => {
   if (maxPrice) params.append('price[lte]', maxPrice);
   if (sort) params.append('sort', sort);
   params.append('page', page.toString());
-  params.append('limit', '18');
+  params.append('limit', '4');
 
   const { data, isLoading, error } = useQuery<Product[], Error>({
     queryKey: ['products', search, maxPrice, sort, page],
@@ -90,21 +90,25 @@ const ProductsPage = () => {
         {data?.map((product) => (
           <Card
             key={product._id}
-            className="w-full border rounded-none bg-orange-100"
+            className="w-full border group rounded-none bg-orange-100"
           >
             <Link href={`/products/${product.slug}`}>
               <CardHeader className="">
                 <Image
-                  src={product.image || '/images/perfumes/perfume10.jpg'}
-                  alt={product.name}
-                  width={300}
-                  height={200}
-                  className="w-full h-56 object-cover "
+                  src={
+                    product?.imageCover
+                      ? `http://localhost:5000/public/images/products/${product.imageCover}`
+                      : '/images/perfumes/default-perfume.jpeg'
+                  }
+                  alt={product?.name || 'Perfume'}
+                  width={100}
+                  height={100}
+                  className="w-full h-56 object-cover"
                 />
               </CardHeader>
-              <CardContent className="p-4">
+              <CardContent className="py-4 ">
                 <h3 className="text-lg font-semibold">{product.name}</h3>
-                <CardDescription className="text-sm text-gray-600 mt-2 line-clamp-2">
+                <CardDescription className="text-sm h-10 text-gray-600 mt-2 line-clamp-2">
                   {product.description}
                 </CardDescription>
               </CardContent>
@@ -117,6 +121,9 @@ const ProductsPage = () => {
                 </div>
                 <div className="text-xl py-2 font-semibold">
                   ${product.price}
+                </div>
+                <div className="border w-full p-3 text-center hover:bg-orange-200 group-hover:bg-orange-200">
+                  Add to Cart
                 </div>
               </CardFooter>
             </Link>

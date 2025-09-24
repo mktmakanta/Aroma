@@ -28,11 +28,13 @@ const productSchema = new mongoose.Schema(
       required: true,
       maxlength: 50,
     },
-    image: {
+    imageCover: {
       type: String,
       trim: true,
-      default: 'https://ui-avatars.com/api/?name=User&background=random',
+      default: '/images/perfumes/default-perfume.jpeg',
     },
+    images: [String],
+    status: { type: String, enum: ['draft', 'published'], default: 'draft' },
     price: {
       type: Number,
       require: [true, 'Price of product is required'],
@@ -53,10 +55,6 @@ const productSchema = new mongoose.Schema(
       required: [true, 'Price of product is required'],
       min: 0,
       default: 0,
-    },
-    published: {
-      type: Boolean,
-      default: false,
     },
 
     user: {

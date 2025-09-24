@@ -1,3 +1,7 @@
+const multer = require('multer');
+const sharp = require('sharp');
+const path = require('path');
+const fs = require('fs');
 const Product = require('../models/Product');
 const APIFeatures = require('./../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
@@ -31,7 +35,7 @@ exports.getProducts = catchAsync(async (req, res, next) => {
 
 // GET A PRODUCT BY SLUG
 exports.getProductBySlug = catchAsync(async (req, res, next) => {
-  const product = await Product.findById(req.params.slug); //populated in middleware
+  const product = await Product.findOne({ slug: req.params.slug });
 
   if (!product) {
     return next(new AppError('Could not find a product with that name', 404));
@@ -53,6 +57,70 @@ exports.createProduct = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+// ---------MULTER and SHARP FOR AVATAR UPLOAD ON UPDATE-----------
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Not an image! Please upload only images.'), false);
+  }
+};
+
+exports.uploadProductImages = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+}).fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 4 },
+]);
+
+exports.resizeProductImages = async (req, res, next) => {
+  if (!req.files.imageCover && !req.files.images) return next();
+
+  try {
+    if (req.files.imageCover) {
+      const coverFilename = `product-${req.params.id}-${Date.now()}-cover.jpeg`;
+
+      await sharp(req.files.imageCover[0].buffer)
+        .resize(625, 500)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(
+          path.join(__dirname, '../public/images/products', coverFilename)
+        );
+
+      req.body.imageCover = coverFilename;
+    }
+
+    if (req.files.images) {
+      req.body.images = [];
+
+      await Promise.all(
+        req.files.images.map(async (file, i) => {
+          const filename = `product-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+
+          await sharp(file.buffer)
+            .resize(500, 500)
+            .toFormat('jpeg')
+            .jpeg({ quality: 90 })
+            .toFile(
+              path.join(__dirname, '../public/images/products', filename)
+            );
+
+          req.body.images.push(filename);
+        })
+      );
+    }
+  } catch (err) {
+    console.error('Sharp error:', err);
+    return next(err);
+  }
+
+  next();
+};
 
 // UPDATE PRODUCT
 exports.updateProduct = catchAsync(async (req, res, next) => {

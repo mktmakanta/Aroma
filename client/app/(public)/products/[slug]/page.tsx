@@ -15,7 +15,7 @@ const fetchProduct = async (slug: string): Promise<Product> => {
   if (res.status === 401) {
     throw new Error('Unauthorized');
   }
-  console.log(res);
+
   if (!res.ok) {
     throw new Error('Failed to fetch product');
   }

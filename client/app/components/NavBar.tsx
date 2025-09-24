@@ -2,14 +2,12 @@
 
 import Link from 'next/link';
 import { Gem, ShoppingCart } from 'lucide-react';
-
-import SearchAndNav from './miniComponents/SearchAndNav';
 import { CurrentUserStatus } from './CurrentUserStatus';
 
 const Navbar = () => {
   return (
-    <nav className=" w-full flex sticky top-0 z-10 justify-center">
-      <div className="w-full  bg-orange-100 mx-auto border-b  p-4 md:p-6 sm:px-5 lg:px-16 ">
+    <nav className=" w-full bg-orange-100 flex sticky top-0 z-10 justify-center">
+      <div className="w-full   mx-auto border-b  p-4 md:p-6 sm:px-5 lg:px-16 ">
         <div className="flex items-center justify-between">
           {/* Logo Section */}
           <div className="flex items-center">
@@ -21,8 +19,12 @@ const Navbar = () => {
               <span className="text-sm hidden md:flex"> Aroma De Royal</span>
             </Link>
           </div>
-          <div className="">
-            <SearchAndNav />
+          <div className="hidden md:flex items-center space-x-4 font-geist">
+            <ul className="flex space-x-8 font-mono text-sm font-medium  ">
+              <li className="cursor-pointer hover:text-orange-400">Home</li>
+              <li className="cursor-pointer hover:text-orange-400">About</li>
+              <li className="cursor-pointer hover:text-orange-400">Contact</li>
+            </ul>
           </div>
 
           {/* Desktop Menu */}
@@ -43,9 +45,9 @@ const Navbar = () => {
         <Link href="/cart" className=" text-black hover:text-red-600  ">
           <ShoppingCart />
         </Link>
-        <button className=" text-black hover:text-red-600 ">
+        <span className=" text-black hover:text-red-600 ">
           <CurrentUserStatus />
-        </button>
+        </span>
       </div>
     </nav>
   );

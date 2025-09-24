@@ -50,8 +50,8 @@ export const CurrentUserStatus = () => {
       }
 
       setUser(null);
-      setDropdownOpen(false); // Close dropdown after logout
-      router.push('/'); // Redirect to home or login page
+      setDropdownOpen(false);
+      router.push('/');
     } catch (err) {
       console.error('Logout error:', err);
       alert('Failed to log out. Please try again.');

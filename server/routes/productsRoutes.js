@@ -11,6 +11,8 @@ const {
   productStats,
   categoryStats,
   deleteAllProducts,
+  uploadProductImages,
+  resizeProductImages,
 } = require('../controllers/productController');
 const { protect, restrictTO } = require('../controllers/authControllers');
 
@@ -28,6 +30,7 @@ router.route('/products-stats').get(productStats);
 router.route('/categories-stats').get(categoryStats);
 router.route('/delete-all').delete(deleteAllProducts);
 
-router.route('/:id').patch(updateProduct).delete(deleteProduct);
+router.patch('/:id', uploadProductImages, resizeProductImages, updateProduct);
+router.delete('/:id', deleteProduct);
 
 module.exports = router;

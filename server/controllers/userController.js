@@ -111,7 +111,7 @@ exports.getMe = catchAsync(async (req, res, next) => {
   });
 });
 
-// MULTER and SHARP FOR AVATAR UPLOAD
+// MULTER and SHARP FOR AVATAR UPLOAD ON UPDATE
 const multerStorage = multer.memoryStorage();
 
 const multerFilter = (req, file, cb) => {
