@@ -15,6 +15,8 @@ import {
   ArrowLeft,
   RefreshCw,
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { fetchProductById } from '@/services/products';
 
 interface ProductForm {
   name: string;
@@ -54,19 +56,17 @@ interface ExistingProduct {
   updatedAt: string;
 }
 
-interface ProductFormComponentProps {
-  productId?: string | null; // If provided, component is in update mode
+interface UpdateProductProps {
+  productId?: string | null;
   onCancel?: () => void;
-  onSuccess?: (product: ExistingProduct | ProductForm) => void;
+  onSuccess?: (product: ExistingProduct) => void;
 }
 
-const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
+const UpdateProductComponent: React.FC<UpdateProductProps> = ({
   productId,
   onCancel,
   onSuccess,
 }) => {
-  const isUpdateMode = Boolean(productId);
-
   const [formData, setFormData] = useState<ProductForm>({
     name: '',
     description: '',
@@ -84,7 +84,7 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
   const [images, setImages] = useState<ImageFile[]>([]);
   const [errors, setErrors] = useState<Partial<ProductForm>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(isUpdateMode);
+  // const [isLoading, setIsLoading] = useState(true);
   const [newCategory, setNewCategory] = useState('');
   const [newTag, setNewTag] = useState('');
   const [hasChanges, setHasChanges] = useState(false);
@@ -92,30 +92,16 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
   const imageCoverRef = useRef<HTMLInputElement>(null);
   const imagesRef = useRef<HTMLInputElement>(null);
 
-  // Mock existing product data for update mode
-  const mockProduct: ExistingProduct = {
-    _id: productId || '',
-    name: 'Chanel No. 5 Eau de Parfum',
-    description:
-      "The world's most iconic fragrance. A timeless scent in a radically minimal bottle. CHANEL N°5 is the very essence of femininity. Its bouquet is composed around rose and jasmine.",
-    brand: 'Chanel',
-    price: 120.0,
-    priceDiscount: 95.0,
-    countInStock: 245,
-    status: 'published',
-    categories: ["Women's Perfume", 'Luxury'],
-    tags: ['Floral', 'Classic'],
-    imageCover: '/images/perfumes/chanel-no5-cover.jpg',
-    images: [
-      '/images/perfumes/chanel-no5-1.jpg',
-      '/images/perfumes/chanel-no5-2.jpg',
-      '/images/perfumes/chanel-no5-3.jpg',
-    ],
-    slug: 'chanel-no-5-eau-de-parfum',
-    createdAt: '2024-01-15T10:30:00Z',
-    updatedAt: '2024-01-20T14:45:00Z',
-  };
-
+  // Sample existing product data (in real app, this would come from API)
+  const {
+    data: product,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['product', productId],
+    queryFn: () => fetchProductById(productId),
+    enabled: !!productId, // don't fetch if productId is not provided
+  });
   const availableCategories = [
     "Men's Perfume",
     "Women's Perfume",
@@ -134,82 +120,65 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
     'Modern',
   ];
 
-  // Load existing product data in update mode
+  console.log(product);
+  // Load existing product data once it’s fetched by React Query
   useEffect(() => {
-    if (!isUpdateMode) {
-      setIsLoading(false);
-      return;
-    }
+    if (product) {
+      // 📝 Basic fields
+      const productData: ProductForm = {
+        name: product.name,
+        description: product.description,
+        brand: product.brand,
+        price: product.price,
+        priceDiscount: product.priceDiscount || '',
+        countInStock: product.countInStock,
+        status: product.status,
+        categories: product.categories.map((c: any) => c.name), // ✅ get names
+        tags: product.tags.map((t: any) => t.name),
+      };
 
-    const loadProduct = async (): Promise<void> => {
-      setIsLoading(true);
-      try {
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+      setFormData(productData);
+      setOriginalData(productData);
 
-        const productData: ProductForm = {
-          name: mockProduct.name,
-          description: mockProduct.description,
-          brand: mockProduct.brand,
-          price: mockProduct.price,
-          priceDiscount: mockProduct.priceDiscount || '',
-          countInStock: mockProduct.countInStock,
-          status: mockProduct.status,
-          categories: [...mockProduct.categories],
-          tags: [...mockProduct.tags],
-        };
+      const SERVER_URL = 'http://localhost:5000/public/products';
 
-        setFormData(productData);
-        setOriginalData(productData);
-
-        // Load existing images
-        if (mockProduct.imageCover) {
-          setImageCover({
-            id: 'cover',
-            preview: mockProduct.imageCover,
-            url: mockProduct.imageCover,
-            isExisting: true,
-          });
-        }
-
-        const existingImages = mockProduct.images.map((url, index) => ({
-          id: `existing-${index}`,
-          preview: url,
-          url: url,
+      // 🖼️ Cover Image
+      if (product.imageCover) {
+        setImageCover({
+          id: 'cover',
+          preview: `${SERVER_URL}/${product.imageCover}`,
+          url: product.imageCover,
           isExisting: true,
-        }));
-        setImages(existingImages);
-      } catch (error) {
-        console.error('Error loading product:', error);
-      } finally {
-        setIsLoading(false);
+        });
       }
-    };
 
-    loadProduct();
-  }, [productId, isUpdateMode]);
-
-  // Check for changes (only in update mode)
-  useEffect(() => {
-    if (!isUpdateMode || !originalData) {
-      setHasChanges(false);
-      return;
+      // 🖼️ Gallery Images
+      if (Array.isArray(product.images) && product.images.length > 0) {
+        const existingImages = product.images.map(
+          (filename: string, index: number) => ({
+            id: `existing-${index}`,
+            preview: `${SERVER_URL}/${filename}`, // full URL here
+            url: filename, // keep filename
+            isExisting: true,
+          })
+        );
+        setImages(existingImages);
+      }
     }
+  }, [product]);
+
+  // Check for changes
+  useEffect(() => {
+    if (!originalData) return;
 
     const currentData = JSON.stringify(formData);
     const originalDataStr = JSON.stringify(originalData);
     const imagesChanged =
       images.some((img) => !img.isExisting) ||
       (imageCover && !imageCover.isExisting);
-    const imagesRemoved =
-      originalData &&
-      ((mockProduct.imageCover && !imageCover) ||
-        images.length < mockProduct.images.length);
 
-    setHasChanges(
-      currentData !== originalDataStr || imagesChanged || imagesRemoved
-    );
-  }, [formData, originalData, images, imageCover, isUpdateMode]);
+    setHasChanges(currentData !== (originalDataStr || imagesChanged));
+  }, [formData, originalData, images, imageCover]);
 
   const handleInputChange = (
     e: React.ChangeEvent<
@@ -366,7 +335,7 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
       return;
     }
 
-    if (isUpdateMode && !hasChanges) {
+    if (!hasChanges) {
       alert('No changes detected');
       return;
     }
@@ -385,21 +354,8 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
         }
       });
 
-      if (isUpdateMode) {
-        productData.append('id', productId!);
-
-        // Add existing image URLs to preserve
-        const existingImages = images
-          .filter((img) => img.isExisting)
-          .map((img) => img.url);
-        existingImages.forEach((url) =>
-          productData.append('existingImages', url!)
-        );
-
-        if (imageCover?.isExisting) {
-          productData.append('existingImageCover', imageCover.url!);
-        }
-      }
+      // Add product ID
+      // productData.append('id', productId);
 
       // Add new images
       if (imageCover && !imageCover.isExisting) {
@@ -412,73 +368,45 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
         }
       });
 
+      // Add existing image URLs to preserve
+      const existingImages = images
+        .filter((img) => img.isExisting)
+        .map((img) => img.url);
+      existingImages.forEach((url) =>
+        productData.append('existingImages', url!)
+      );
+
+      if (imageCover?.isExisting) {
+        productData.append('existingImageCover', imageCover.url!);
+      }
+
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      if (isUpdateMode) {
-        const updatedProduct: ExistingProduct = {
-          ...mockProduct,
-          ...formData,
-          price: Number(formData.price),
-          priceDiscount: formData.priceDiscount
-            ? Number(formData.priceDiscount)
-            : undefined,
-          countInStock: Number(formData.countInStock),
-          updatedAt: new Date().toISOString(),
-        };
+      const updatedProduct: ExistingProduct = {
+        ...product!,
+        ...formData,
+        price: Number(formData.price),
+        priceDiscount: formData.priceDiscount
+          ? Number(formData.priceDiscount)
+          : undefined,
+        countInStock: Number(formData.countInStock),
+        updatedAt: new Date().toISOString(),
+      };
 
-        console.log('Product updated successfully:', updatedProduct);
+      console.log('Product updated successfully:', updatedProduct);
 
-        if (onSuccess) {
-          onSuccess(updatedProduct);
-        } else {
-          alert('Product updated successfully!');
-        }
-
-        setOriginalData({ ...formData });
+      if (onSuccess) {
+        onSuccess(updatedProduct);
       } else {
-        const newProduct = {
-          ...formData,
-          price: Number(formData.price),
-          priceDiscount: formData.priceDiscount
-            ? Number(formData.priceDiscount)
-            : undefined,
-          countInStock: Number(formData.countInStock),
-        };
-
-        console.log('Product added successfully:', newProduct);
-
-        if (onSuccess) {
-          onSuccess(newProduct);
-        } else {
-          alert('Product added successfully!');
-        }
-
-        // Reset form for add mode
-        setFormData({
-          name: '',
-          description: '',
-          brand: '',
-          price: '',
-          priceDiscount: '',
-          countInStock: '',
-          status: 'draft',
-          categories: [],
-          tags: [],
-        });
-        setImageCover(null);
-        setImages([]);
+        alert('Product updated successfully!');
       }
+
+      // Update original data to reflect saved state
+      setOriginalData({ ...formData });
     } catch (error) {
-      console.error(
-        `Error ${isUpdateMode ? 'updating' : 'adding'} product:`,
-        error
-      );
-      alert(
-        `Error ${
-          isUpdateMode ? 'updating' : 'adding'
-        } product. Please try again.`
-      );
+      console.error('Error updating product:', error);
+      alert('Error updating product. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -490,45 +418,29 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
   };
 
   const handleReset = (): void => {
-    if (isUpdateMode && originalData) {
+    if (originalData) {
       setFormData({ ...originalData });
       setErrors({});
 
       // Reset images to original state
-      if (mockProduct.imageCover) {
+      if (product.imageCover) {
         setImageCover({
           id: 'cover',
-          preview: mockProduct.imageCover,
-          url: mockProduct.imageCover,
+          preview: product.imageCover,
+          url: product.imageCover,
           isExisting: true,
         });
       } else {
         setImageCover(null);
       }
 
-      const existingImages = mockProduct.images.map((url, index) => ({
+      const existingImages = product.images.map((url, index) => ({
         id: `existing-${index}`,
         preview: url,
         url: url,
         isExisting: true,
       }));
       setImages(existingImages);
-    } else {
-      // Reset form for add mode
-      setFormData({
-        name: '',
-        description: '',
-        brand: '',
-        price: '',
-        priceDiscount: '',
-        countInStock: '',
-        status: 'draft',
-        categories: [],
-        tags: [],
-      });
-      setImageCover(null);
-      setImages([]);
-      setErrors({});
     }
   };
 
@@ -561,19 +473,18 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
             )}
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                {isUpdateMode ? 'Update Product' : 'Add New Product'}
+                Update Product
               </h1>
               <p className="text-gray-600 mt-1">
-                {isUpdateMode
-                  ? `Product ID: ${productId} • Last updated: ${new Date(
-                      mockProduct.updatedAt
-                    ).toLocaleDateString()}`
-                  : 'Create a new perfume product for your store'}
+                Product ID: {product?._id} • Last updated:{' '}
+                {product?.updatedAt
+                  ? new Date(product.updatedAt).toLocaleDateString()
+                  : 'N/A'}
               </p>
             </div>
           </div>
 
-          {isUpdateMode && hasChanges && (
+          {hasChanges && (
             <div className="flex items-center space-x-2 text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
               <AlertCircle className="w-4 h-4" />
               <span className="text-sm font-medium">Unsaved changes</span>
@@ -582,7 +493,7 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
         </div>
       </div>
 
-      <div className="space-y-8">
+      <div onSubmit={handleSubmit} className="space-y-8">
         {/* Basic Information */}
         <div className="bg-gray-50 rounded-lg p-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
@@ -798,7 +709,7 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
                 >
                   <Upload className="w-8 h-8 mx-auto text-gray-400 mb-2" />
                   <p className="text-gray-600">
-                    Click to upload {isUpdateMode ? 'new' : ''} cover image
+                    Click to upload new cover image
                   </p>
                   <p className="text-xs text-gray-500 mt-1">
                     JPG, PNG up to 10MB
@@ -809,7 +720,7 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
               {imageCover && (
                 <div className="flex-shrink-0 relative">
                   <img
-                    src={imageCover.preview}
+                    src={imageCover.url}
                     alt="Cover preview"
                     className="w-32 h-32 object-cover rounded-lg border"
                   />
@@ -839,7 +750,7 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
               {images.map((image) => (
                 <div key={image.id} className="relative">
                   <img
-                    src={image.preview}
+                    src={image.isExisting ? image.url : image.preview}
                     alt="Product preview"
                     className="w-full h-24 object-cover rounded-lg border"
                   />
@@ -1023,32 +934,19 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
 
         {/* Form Actions */}
         <div className="flex flex-col sm:flex-row gap-4 pt-6">
-          {isUpdateMode && (
-            <button
-              type="button"
-              onClick={handleReset}
-              disabled={!hasChanges}
-              className={`flex items-center justify-center px-6 py-3 border rounded-lg transition-colors ${
-                hasChanges
-                  ? 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                  : 'border-gray-200 text-gray-400 cursor-not-allowed'
-              }`}
-            >
-              <RefreshCw className="w-5 h-5 mr-2" />
-              Reset Changes
-            </button>
-          )}
-
-          {!isUpdateMode && (
-            <button
-              type="button"
-              onClick={handleReset}
-              className="flex items-center justify-center px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              <RefreshCw className="w-5 h-5 mr-2" />
-              Clear Form
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleReset}
+            disabled={!hasChanges}
+            className={`flex items-center justify-center px-6 py-3 border rounded-lg transition-colors ${
+              hasChanges
+                ? 'border-gray-300 text-gray-700 hover:bg-gray-50'
+                : 'border-gray-200 text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            <RefreshCw className="w-5 h-5 mr-2" />
+            Reset Changes
+          </button>
 
           <button
             type="button"
@@ -1062,9 +960,9 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
           <button
             type="button"
             onClick={handleSubmit}
-            disabled={isSubmitting || (isUpdateMode && !hasChanges)}
+            disabled={isSubmitting || !hasChanges}
             className={`flex items-center justify-center px-8 py-3 rounded-lg transition-colors ${
-              isSubmitting || (isUpdateMode && !hasChanges)
+              isSubmitting || !hasChanges
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-orange-600 hover:bg-orange-700'
             } text-white`}
@@ -1072,12 +970,12 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
             {isSubmitting ? (
               <>
                 <div className="w-5 h-5 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                {isUpdateMode ? 'Updating...' : 'Adding...'}
+                Updating Product...
               </>
             ) : (
               <>
                 <Save className="w-5 h-5 mr-2" />
-                {isUpdateMode ? 'Update Product' : 'Add Product'}
+                Update Product
               </>
             )}
           </button>
@@ -1087,4 +985,4 @@ const ProductFormComponent: React.FC<ProductFormComponentProps> = ({
   );
 };
 
-export default ProductFormComponent;
+export default UpdateProductComponent;

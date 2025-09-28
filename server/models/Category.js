@@ -5,15 +5,7 @@ const categorySchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      enum: [
-        'Men',
-        'Women',
-        'Luxury',
-        'Designer',
-        'Summer Collection',
-        'Winter Collection',
-        'Gift Set',
-      ],
+      enum: ["Men's Perfume", "Women's Perfume", 'Unisex', 'Luxury', 'Budget'],
 
       trim: true,
     },

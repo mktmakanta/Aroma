@@ -1,4 +1,8 @@
 'use client';
+import Image from 'next/image';
+import ProductModal from '../../_components/ProductModal';
+import { useQuery } from '@tanstack/react-query';
+import { fetchProducts } from '@/services/products';
 
 import React, { useState } from 'react';
 import {
@@ -14,10 +18,6 @@ import {
   Trash2,
   DollarSign,
 } from 'lucide-react';
-import ProductModal from '../../_components/ProductModal';
-import { useQuery } from '@tanstack/react-query';
-import { fetchProducts } from '@/lib/helpers/products';
-import Image from 'next/image';
 
 interface PerfumeProduct {
   _id: string;
@@ -57,7 +57,7 @@ const AdminProductsPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
 
-  // FOR MODAL (ADD AND EDIT OD PRODUCT)
+  // FOR MODAL (ADD AND EDIT OF PRODUCT)
   const handleAdd = () => {
     setEditingProductId(null);
     setIsModalOpen(true);
@@ -183,7 +183,6 @@ const AdminProductsPage = () => {
           <input
             type="checkbox"
             className="sr-only peer"
-            
             defaultChecked={data.status === 'published'}
           />
           <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-500"></div>
@@ -191,10 +190,11 @@ const AdminProductsPage = () => {
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
         <div className="flex items-center space-x-2">
-          <button className="p-1 hover:bg-gray-100 rounded" title="View">
-            <Eye className="w-4 h-4 text-gray-600" />
-          </button>
-          <button className="p-1 hover:bg-gray-100 rounded" title="Edit">
+          <button
+            onClick={() => handleEdit(data._id)}
+            className="p-1 hover:bg-gray-100 rounded"
+            title="Edit"
+          >
             <Edit className="w-4 h-4 text-gray-600" />
           </button>
           <button className="p-1 hover:bg-gray-100 rounded" title="Delete">
@@ -253,10 +253,7 @@ const AdminProductsPage = () => {
                   <span>Sort by: Default</span>
                   <ChevronDown className="w-4 h-4" />
                 </div>
-                <button
-                  onClick={() => handleEdit('PF001')}
-                  className="flex items-center space-x-2 px-4 py-2 text-orange-600 border border-orange-600 rounded-lg hover:bg-orange-50"
-                >
+                <button className="flex items-center space-x-2 px-4 py-2 text-orange-600 border border-orange-600 rounded-lg hover:bg-orange-50">
                   <Filter className="w-4 h-4" />
                   <span>Filter</span>
                 </button>

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useAuth } from '@/app/providers/AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 import { useQueryClient } from '@tanstack/react-query';
 
 const SettingsPage = () => {

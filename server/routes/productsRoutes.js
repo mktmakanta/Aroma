@@ -13,6 +13,7 @@ const {
   deleteAllProducts,
   uploadProductImages,
   resizeProductImages,
+  getProductById,
 } = require('../controllers/productController');
 const { protect, restrictTO } = require('../controllers/authControllers');
 
@@ -21,9 +22,11 @@ router.route('/top-5-products').get(topProducts, getProducts);
 
 router.use(protect); // logged in user
 
-router.route('/:slug').get(getProductBySlug);
+router.route('/slug/:slug').get(getProductBySlug);
 
 router.use(restrictTO('admin')); // admin only
+
+router.get('/id/:id', getProductById);
 
 router.post('/', createProduct);
 router.route('/products-stats').get(productStats);

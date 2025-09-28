@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { X } from 'lucide-react';
-import ProductFormComponent from './ProductForm';
+import UpdateProductComponent from './ProductForm';
 
 interface ProductModalProps {
   productId?: string | null;
@@ -36,7 +36,7 @@ const ProductModal: React.FC<ProductModalProps> = ({
         </button>
 
         {/* Add Product Form */}
-        <ProductFormComponent
+        <UpdateProductComponent
           productId={productId}
           onSuccess={() => onClose()}
           onCancel={onClose}

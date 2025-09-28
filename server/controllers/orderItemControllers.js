@@ -62,8 +62,7 @@ exports.updateOrderItem = catchAsync(async (req, res, next) => {
 exports.deleteOrderItem = catchAsync(async (req, res, next) => {
   const orderItem = await OrderItem.findById(req.params.id);
 
-  if (!orderItem)
-    return next(new AppError('Order item not found', 404));
+  if (!orderItem) return next(new AppError('Order item not found', 404));
 
   await orderItem.deleteOne();
   res.json({ message: 'Order item removed' });

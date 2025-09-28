@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import React, { useState } from 'react';
-import { useAuth } from '@/app/providers/AuthContext';
+import { useAuth } from '@/app/context/AuthContext';
 
 import {
   Search,
